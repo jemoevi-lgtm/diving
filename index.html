@@ -1,31 +1,31 @@
-<!DOCTYPE html>
+<!DOCTYPE html><！DOCTYPE HTML>
 <html lang="zh-TW">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>潛水成本計算器</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',system-ui,sans-serif;font-size:13px;color:#1a1a1a;background:#edecea;min-height:100vh}
+<head>頭部；首領>
+<meta charset="UTF-8"><元 字符集=“UTF-8”>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><元 名稱=“視口” 内容=width=device-width，initial-scale=1.0>
+<title>潛水成本計算器</title><標題>潛水成本計算器</標題>
+<style><風格><風格><風格>
+ url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}*{盒裝縮放:邊界框;保証金:0;填充:0}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:13px;color:#1a1a1a;background:#edecea;min-height:100vh}身體；軀體{字体族:“DM Sans”,系統介面,無襯線;字體大小:13px;顔色:#1a1a1a;背景#edecea；最小高度:100vh}
 .app{display:grid;grid-template-columns:272px 1fr;min-height:100vh}
 
-/* ── LEFT ── */
+/* ── LEFT ── *//* ── LEFT ── */
 .left{background:#f5f2ec;border-right:0.5px solid #dedad2;position:sticky;top:0;height:100vh;overflow-y:auto}
 .li{padding:16px;display:flex;flex-direction:column;gap:10px}
 .logo{display:flex;align-items:center;gap:9px}
 .lm{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#2d6a4f,#40916c);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .lt{font-size:13px;font-weight:600;color:#1a1a1a;letter-spacing:-.02em}
-.ls{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
-.chd{display:flex;align-items:center;justify-content:space-between;padding:4px 6px;cursor:pointer;border-radius:6px}
-.chd:hover{background:rgba(0,0,0,.04)}
-.chn{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.07em}
-.carr{font-size:10px;color:#bbb;display:inline-block;transition:.15s}
-.carr.open{transform:rotate(90deg)}
-.rn{font-size:10px;color:#b0a898;font-weight:500;padding:3px 8px 2px;margin-left:4px;text-transform:uppercase;letter-spacing:.06em}
-.sb{width:calc(100% - 4px);padding:8px 10px;background:transparent;border:0.5px solid transparent;border-radius:8px;text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif;display:block;margin-left:4px;margin-bottom:2px}
-.sb:hover{background:#fff;border-color:#e0dfd8}
-.sb.active{background:#fff;border:1.5px solid #40916c}
+.ls{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:.04em;margin-top:1px}.ls{字體大小:10像素;顔色:#999;文本轉換:超齣範圍;字母間距:.04埃姆;頁邊距上:1像素}
+.chd{display:flex;align-items:center;justify-content:space-between;padding:4px 6px;cursor:pointer;border-radius:6px}.chd{顯示；展示:麯柄;對齊項:中心;居中內容:空格間隔;填充:4像素 6像素;遊標:指鍼;圓角半徑:6像素}
+.chd:hover{background:rgba(0,0,0,.04)}.chd:懸停{背景:rgba(0,0,0,.04)}
+.chn{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.07em}.chn{字體大小:11像素;字體粗細:600;顔色:#888;文本轉換:超齣範圍;字母間距:.07埃姆}
+.carr{font-size:10px;color:#bbb;display:inline-block;transition:.15s}.汽車；車輛{字體大小:10像素;顔色#bbb；顯示；展示:內聯塊;過渡:.15s}
+.carr.open{transform:rotate(90deg)}.汽車；車輛.打開；開啟{變換:旋轉(90度)}
+.rn{font-size:10px;color:#b0a898;font-weight:500;padding:3px 8px 2px;margin-left:4px;text-transform:uppercase;letter-spacing:.06em}.rn{字體大小:10像素;顔色#b0a898；字體粗細:500;填充:3像素 8像素 2像素;邊距左側:4像素;文本轉換:超齣範圍;字母間距:.06埃姆}
+.sb{width:calc(100% - 4px);padding:8px 10px;background:transparent;border:0.5px solid transparent;border-radius:8px;text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif;display:block;margin-left:4px;margin-bottom:2px}.SB{寬度:鈣(100% - 4像素);填充:8像素 10像素;背景:透明的;邊界；邊境:0.5像素 固體 透明的;圓角半徑:8像素;文本對齊:left;遊標:指鍼;字体族:“DM Sans”,無襯線;顯示；展示:塊;邊距左側:4像素;頁邊下:2像素}
+.sb:hover{background:#fff;border-color:#e0dfd8}.SB:懸停{背景#EOF；邊框顔色#e0dfd8}
+.sb.active{background:#fff;border:1.5px solid #40916c}.SB.主動的{背景#EOF；邊界；邊境:1.5像素 固體#40916c}
 .sb.ph{cursor:default;opacity:.4;pointer-events:none}
 .snr{display:flex;align-items:center;gap:4px;margin-bottom:1px}
 .sn{font-size:12px;font-weight:500;color:#333}
@@ -55,9 +55,9 @@ body{font-family:'DM Sans',system-ui,sans-serif;font-size:13px;color:#1a1a1a;bac
 .tab-btn{padding:6px 14px;border:0.5px solid #dedad2;border-radius:8px;background:#fff;color:#888;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
 .tab-btn.on{background:#1a1a1a;color:#fff;border-color:#1a1a1a;font-weight:600}
 .tab-s{display:none}
-.tab-s.show{display:block}
+.tab-s.show{display:block}.標籤.顯示；展示{顯示；展示:塊}
 
-/* Settings bar */
+/* Settings bar *//* 設置欄 */
 .settings-bar{background:#fff;border:0.5px solid #dedad2;border-radius:12px;padding:12px 16px;margin-bottom:10px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .sf{display:flex;flex-direction:column;gap:2px}
 .sf label{font-size:10px;font-weight:600;color:#b0a898;text-transform:uppercase;letter-spacing:.06em}
@@ -253,27 +253,27 @@ tr:last-child td{border-bottom:none}
 <div class="left"><div class="li">
   <div class="logo"><div class="lm">🤿</div><div><div class="lt">潛水成本計算器</div><div class="ls">Contract Library</div></div></div>
   <div id="tree"></div>
-  <hr class="dvd">
-  <div class="ic" id="info-card"><div style="color:#b0a898;font-size:11px">選擇左側潛店以載入合約資訊</div></div>
+  <hr class="dvd">  <小時 階級=“DVD”>
+  <div class="ic" id="info-card"><div style="color:#b0a898;font-size:11px">選擇左側潛店以載入合約資訊</div></div>  <div 階級="ic" id=“信息卡”><div 風格="顔色#b0a898；字體大小:11像素">選擇左側潛店以載入閤約資訊</div></div>
+</div></div></div></div>
+
+<!-- ── RIGHT ── --><!-- ── RIGHT ── -->
+<div class="right"><div 階級="right">
+<div class="tab-bar"><div 階級="分頁列">
+  <button class="tab-btn on" onclick="switchTab('calc',this)">成本計算</button>  <按鈕 階級="tab-btn on" 點擊="切換標籤頁(“鈣”,这)">成本計算</按鈕>
+  <button class="tab-btn" onclick="switchTab('output',this)">輸出摘要</button>  <按鈕 階級=「分頁按鈕」 點擊="切換標籤頁('output',这)">輸齣摘要</按鈕>
+  <div style="flex:1"></div>  <div 風格="麯柄:1"></div>
+  <span id="type-badge" style="display:none;font-size:11px;font-weight:600;padding:3px 10px;border-radius:10px"></span>  <跨度 id=類型：“” 風格="顯示；展示:沒有;字體大小:11像素;字體粗細:600;填充:3像素 10像素;圓角半徑:10像素"></跨度>
 </div></div>
 
-<!-- ── RIGHT ── -->
-<div class="right">
-<div class="tab-bar">
-  <button class="tab-btn on" onclick="switchTab('calc',this)">成本計算</button>
-  <button class="tab-btn" onclick="switchTab('output',this)">輸出摘要</button>
-  <div style="flex:1"></div>
-  <span id="type-badge" style="display:none;font-size:11px;font-weight:600;padding:3px 10px;border-radius:10px"></span>
-</div>
+<!-- CALC TAB --><!-- CALC TAB -->
+<div id="tab-calc" class="tab-s show"><div id="tab-calc" 階級=“標籤頁顯示”>
 
-<!-- CALC TAB -->
-<div id="tab-calc" class="tab-s show">
-
-<!-- Trip name bar -->
-<div class="trip-bar">
-  <span class="trip-bar-icon">✈️</span>
-  <input type="text" id="trip-name" placeholder="輸入行程名稱（如：Moalboal 5D4N）">
-  <div class="trip-bar-divider"></div>
+<!-- Trip name bar --><!-- Trip name bar -->
+<div class="trip-bar"><div 階級=“Trip-bar”>
+  <span class="trip-bar-icon">✈️</span>  <跨度 階級=“trip-bar圖標”>✈️</跨度>
+  <input type="text" id="trip-name" placeholder="輸入行程名稱（如：Moalboal 5D4N）">  <輸入；輸入數據 類型="文字" id=“行程名稱” 延遲器=“輸入行程名稱（如：Moalboal 5D4N）”>
+  <div class="trip-bar-divider"></div>  <div 階級=“trip-bar-divider”></div>
   <div class="trip-date-group">
     <span class="trip-date-label">出發</span>
     <input type="date" class="trip-date-input" id="dep-date" onchange="updateReturnDate()">
@@ -372,7 +372,7 @@ tr:last-child td{border-bottom:none}
     <div class="sec-title"><span class="sec-num">④</span>來回接送<span class="sec-dot skip" id="dot-tran"></span></div>
     <span class="sec-meta" id="tran-meta">—</span>
     <span class="sec-toggle" id="stog-tran">▾</span>
-  </div>
+  </div>  </div>
   <div class="sec-body" id="sbody-tran">
     <table>
       <colgroup><col style="width:28%"><col style="width:16%"><col style="width:12%"><col style="width:12%"><col style="width:16%"><col style="width:10%"><col style="width:6%"></colgroup>
@@ -489,10 +489,10 @@ tr:last-child td{border-bottom:none}
       <div class="rt-pax-l">行程名稱</div>
       <div id="rt-trip-name" style="font-size:12px;font-weight:500;color:#1b4332;text-align:right;max-width:160px;word-break:break-all">—</div>
     </div>
-  </div>
+  </div>  </div>
   <div class="result-rooms" id="result-rooms"></div>
   <div class="result-stats" id="result-stats"></div>
-</div>
+</div></div>
 </div><!-- end calc tab -->
 
 <!-- OUTPUT TAB -->
@@ -504,19 +504,19 @@ tr:last-child td{border-bottom:none}
       <button class="reset-out-btn" onclick="resetOutput()" title="還原自動生成內容">↺ 還原預設</button>
       <button class="copy-btn" id="copy-btn" onclick="copyOut()">複製全部</button>
     </div>
-  </div>
+  </div>  </div>
   <div class="out-mode-row">
     <button class="out-mode-btn on" id="omd-client" onclick="setOutMode('client',this)">📄 客人報價</button>
     <button class="out-mode-btn" id="omd-ai" onclick="setOutMode('ai',this)">🤖 AI 指令版</button>
     <button class="out-mode-btn" id="omd-booking" onclick="setOutMode('booking',this)">📧 英文預約信</button>
-  </div>
+  </div>  </div>
   <!-- Text modes -->
   <div id="out-text-wrap">
     <textarea class="out-textarea" id="out-text" placeholder="請先在成本計算頁填入資料..."></textarea>
     <div class="out-hint" id="out-hint">✦ 不含成本和 markup，可直接傳給客人或用 email 發送</div>
-  </div>
-</div>
-</div>
+  </div>  </div>
+</div></div>
+</div></div>
 
 </div><!-- end right -->
 </div><!-- end app -->
@@ -1742,8 +1742,8 @@ function calc(){
     +'<span><span style="color:#555">台灣端費用</span><span style="color:#aaa">TWD '+fmtK(twTotal)+'</span></span>';
 
   var rr=document.getElementById('result-rooms');rr.innerHTML='';
-  for(var i=0;i<roomBreakdown.length;i++){
-    var rb=roomBreakdown[i];
+  for(var i=0;i<roomBreakdown.length;i++){  爲了(變量 i=0;i<房間明細.長度;i++){
+    var rb=roomBreakdown[i];    變量 紅=房間明細[i];
     var d=document.createElement('div');d.className='rr'+(i===0?' hi':'');
     var inner='<div class="rr-n">'+rb.name+'</div>';
     inner+='<div class="rr-p">TWD '+fmt(rb.sellPrice)+'<span style="font-size:12px;font-weight:400;color:#aaa">/人</span></div>';

@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>潛水成本計算器</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',system-ui,sans-serif;font-size:13px;color:#1a1a1a;background:#edecea;min-height:100vh}
+.app{display:grid;grid-template-columns:272px 1fr;min-height:100vh}
+
+/* ── LEFT ── */
+.left{background:#f5f2ec;border-right:0.5px solid #dedad2;position:sticky;top:0;height:100vh;overflow-y:auto}
+.li{padding:16px;display:flex;flex-direction:column;gap:10px}
+.logo{display:flex;align-items:center;gap:9px}
+.lm{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#2d6a4f,#40916c);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.lt{font-size:13px;font-weight:600;color:#1a1a1a;letter-spacing:-.02em}
+.ls{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
+.chd{display:flex;align-items:center;justify-content:space-between;padding:4px 6px;cursor:pointer;border-radius:6px}
+.chd:hover{background:rgba(0,0,0,.04)}
+.chn{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.07em}
+.carr{font-size:10px;color:#bbb;display:inline-block;transition:.15s}
+.carr.open{transform:rotate(90deg)}
+.rn{font-size:10px;color:#b0a898;font-weight:500;padding:3px 8px 2px;margin-left:4px;text-transform:uppercase;letter-spacing:.06em}
+.sb{width:calc(100% - 4px);padding:8px 10px;background:transparent;border:0.5px solid transparent;border-radius:8px;text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif;display:block;margin-left:4px;margin-bottom:2px}
+.sb:hover{background:#fff;border-color:#e0dfd8}
+.sb.active{background:#fff;border:1.5px solid #40916c}
+.sb.ph{cursor:default;opacity:.4;pointer-events:none}
+.snr{display:flex;align-items:center;gap:4px;margin-bottom:1px}
+.sn{font-size:12px;font-weight:500;color:#333}
+.sb.active .sn{color:#1b4332}
+.ss2{font-size:10px;color:#b0a898}
+.stag{font-size:9px;font-weight:700;padding:1px 4px;border-radius:3px}
+.tag-hkd{background:#fef9c3;color:#854d0e}
+.tag-usd{background:#dbeafe;color:#1e3a8a}
+.tag-comm{background:#f3e8ff;color:#6b21a8}
+.tag-resort{background:#fce7f3;color:#9d174d}
+.tag-live{background:#ede9fe;color:#5b21b6}
+.dvd{border:none;border-top:0.5px solid #dedad2;margin:2px 0}
+.ic{background:#fff;border:0.5px solid #dedad2;border-radius:10px;padding:11px;display:flex;flex-direction:column;gap:7px;font-size:11px}
+.ic-t{font-size:12px;font-weight:600;color:#1b4332}
+.ic-m{display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin-bottom:2px}
+.ic-l{font-size:10px;font-weight:600;color:#b0a898;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;margin-top:3px}
+.ic-li{color:#555;line-height:1.65}
+.ic-li li{list-style:none;padding-left:11px;position:relative}
+.ic-li li::before{content:'✓';position:absolute;left:0;color:#40916c;font-size:9px;top:2px}
+.ic-li.ex li::before{content:'✗';color:#e74c3c}
+.ic-n{font-size:11px;color:#92700a;background:#fffbf0;border:0.5px solid #f0d99a;border-radius:6px;padding:6px 8px;line-height:1.5}
+.vp{font-size:10px;color:#2d6a4f;background:#d1fae5;padding:2px 7px;border-radius:10px;font-weight:500}
+
+/* ── RIGHT ── */
+.right{padding:20px;overflow-y:auto}
+.tab-bar{display:flex;gap:6px;margin-bottom:14px;align-items:center}
+.tab-btn{padding:6px 14px;border:0.5px solid #dedad2;border-radius:8px;background:#fff;color:#888;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.tab-btn.on{background:#1a1a1a;color:#fff;border-color:#1a1a1a;font-weight:600}
+.tab-s{display:none}
+.tab-s.show{display:block}
+
+/* Settings bar */
+.settings-bar{background:#fff;border:0.5px solid #dedad2;border-radius:12px;padding:12px 16px;margin-bottom:10px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.sf{display:flex;flex-direction:column;gap:2px}
+.sf label{font-size:10px;font-weight:600;color:#b0a898;text-transform:uppercase;letter-spacing:.06em}
+.sf input,.sf select{padding:5px 8px;border:0.5px solid #dedad2;border-radius:7px;background:#f9f7f4;color:#1a1a1a;font-size:12px;font-family:'DM Sans',sans-serif;width:100%}
+.sf input:focus,.sf select:focus{outline:none;border-color:#40916c}
+.sf .sh{font-size:10px;color:#b0a898;margin-top:1px}
+.foc-desc{padding:5px 0;font-size:11px;color:#777}
+
+/* Section cards */
+.sec{background:#fff;border:0.5px solid #dedad2;border-radius:12px;margin-bottom:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.sec-h{padding:8px 14px;background:#f9f7f4;border-bottom:0.5px solid #eae7e0;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none}
+.sec-title{font-size:12px;font-weight:600;color:#555;display:flex;align-items:center;gap:6px}
+.sec-num{font-size:10px;font-weight:700;color:#40916c;background:#d1fae5;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.sec-meta{font-size:11px;color:#b0a898;font-weight:400}
+.sec-toggle{font-size:11px;color:#bbb}
+.sec-body{padding:12px 14px}
+.sec-body.hidden{display:none}
+
+/* Tables */
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th{padding:6px 7px;text-align:left;font-size:10px;font-weight:600;color:#b0a898;border-bottom:0.5px solid #eae7e0;background:#f9f7f4;text-transform:uppercase;letter-spacing:.05em}
+td{padding:4px 5px;border-bottom:0.5px solid #f2f0eb;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.ti{width:100%;padding:3px 5px;border:0.5px solid transparent;border-radius:5px;background:transparent;color:#1a1a1a;font-size:12px;font-family:'DM Sans',sans-serif}
+.ti:hover,.ti:focus{border-color:#dedad2;background:#f9f7f4;outline:none}
+.td-r{color:#2d6a4f;font-size:11px;font-family:'DM Mono',monospace;font-weight:500}
+.td-m{color:#b0a898;font-size:11px;font-family:'DM Mono',monospace}
+.add-r{font-size:11px;color:#2d6a4f;background:none;border:none;cursor:pointer;padding:6px 14px;text-align:left;border-top:0.5px solid #f2f0eb;font-family:'DM Sans',sans-serif;font-weight:500;width:100%;display:block}
+.del{font-size:12px;color:#ccc;background:none;border:none;cursor:pointer;padding:1px 3px}
+.del:hover{color:#e74c3c}
+.sec-sub{display:flex;justify-content:space-between;padding:6px 14px;font-size:11px;border-top:0.5px solid #eae7e0;color:#b0a898;font-weight:500}
+.sec-sub span:last-child{color:#1a1a1a;font-family:'DM Mono',monospace;font-weight:600}
+
+/* Duration buttons */
+.dur-row{display:flex;gap:5px;margin-bottom:10px}
+.dur-btn{flex:1;padding:7px 4px;border:0.5px solid #dedad2;border-radius:8px;background:#f9f7f4;color:#555;font-size:11px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;text-align:center;line-height:1.4}
+.dur-btn.on{background:#2d6a4f;color:#fff;border-color:#2d6a4f;font-weight:600}
+.dur-btn:hover:not(.on){border-color:#a8d5b9;background:#f0fdf8}
+
+/* Meal plan */
+.meal-row{display:flex;gap:5px;margin-bottom:6px}
+.meal-btn{flex:1;padding:7px 4px;border:0.5px solid #dedad2;border-radius:8px;background:#f9f7f4;color:#555;font-size:11px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;text-align:center;line-height:1.4}
+.meal-btn.on{background:#2d6a4f;color:#fff;border-color:#2d6a4f;font-weight:600}
+.meal-single{font-size:12px;font-weight:500;color:#2d6a4f;padding:4px 0}
+
+/* Dive mode */
+.mode-toggle{display:flex;gap:0;border:0.5px solid #dedad2;border-radius:8px;overflow:hidden;width:fit-content;margin-bottom:10px}
+.mode-btn{padding:5px 12px;border:none;cursor:pointer;font-size:11px;font-family:'DM Sans',sans-serif;font-weight:500;color:#888;background:#f9f7f4}
+.mode-btn.on{background:#1a1a1a;color:#fff;font-weight:600}
+.included-badge{font-size:12px;color:#2d6a4f;background:#eef7f2;border:0.5px solid #b7dfc9;border-radius:7px;padding:8px 12px;display:inline-flex;align-items:center;gap:6px}
+
+/* Equipment & addon rows */
+.eq-row{display:grid;grid-template-columns:16px 1fr 44px 16px 44px 16px minmax(70px,auto) 1fr;gap:5px;align-items:center;padding:6px 14px;border-bottom:0.5px solid #f2f0eb}
+.eq-row:last-child{border-bottom:none}
+.eq-row.off .eq-name,.eq-row.off .eq-val{color:#ccc}
+.eq-ck{width:14px;height:14px;cursor:pointer;accent-color:#40916c}
+.eq-name{font-size:12px;color:#333;font-weight:500}
+.eq-n{width:40px;padding:3px 5px;border:0.5px solid #dedad2;border-radius:5px;background:#f9f7f4;font-size:12px;text-align:center}
+.eq-n:focus{outline:none;border-color:#40916c}
+.eq-unit{font-size:11px;color:#b0a898}
+.eq-val{font-size:11px;font-family:'DM Mono',monospace;color:#2d6a4f}
+.eq-rate{font-size:10px;color:#b0a898;text-align:right}
+.ao-row{display:grid;grid-template-columns:1fr 90px 44px 16px minmax(70px,auto) 1fr;gap:5px;align-items:center;padding:6px 14px;border-bottom:0.5px solid #f2f0eb}
+.ao-row:last-child{border-bottom:none}
+.ao-name{font-size:12px;color:#333;font-weight:500}
+.ao-sub{font-size:10px;color:#b0a898}
+.ao-mode{padding:3px 6px;border:0.5px solid #dedad2;border-radius:6px;background:#f9f7f4;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;width:100%}
+.ao-n{width:40px;padding:3px 5px;border:0.5px solid #dedad2;border-radius:5px;background:#f9f7f4;font-size:12px;text-align:center}
+.ao-n:focus{outline:none;border-color:#40916c}
+.ao-unit{font-size:11px;color:#b0a898}
+.ao-val{font-size:11px;font-family:'DM Mono',monospace;color:#2d6a4f}
+.ao-val.ref{color:#b0a898}
+.ao-rate{font-size:10px;color:#b0a898;text-align:right}
+
+/* TW section */
+.tw-row{display:flex;align-items:center;gap:8px;padding:7px 14px;border-bottom:0.5px solid #f2f0eb}
+.tw-row:last-child{border-bottom:none}
+.tw-ck{width:14px;height:14px;cursor:pointer;accent-color:#40916c;flex-shrink:0}
+.tw-name{flex:1;font-size:12px;color:#333;font-weight:500}
+.tw-sub{font-size:10px;color:#b0a898}
+.tw-inp{width:88px;padding:3px 7px;border:0.5px solid #dedad2;border-radius:6px;background:#f9f7f4;font-size:12px;font-family:'DM Mono',monospace;text-align:right}
+.tw-inp:focus{outline:none;border-color:#40916c}
+.tw-cur{font-size:11px;color:#b0a898;width:50px;flex-shrink:0}
+.tw-res{font-size:11px;font-family:'DM Mono',monospace;color:#2d6a4f;min-width:80px;text-align:right;flex-shrink:0}
+
+/* RESULTS */
+.result-wrap{background:#fff;border:0.5px solid #dedad2;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:10px}
+.result-top{background:linear-gradient(135deg,#eef7f2,#f0f9ff);border-bottom:0.5px solid #b7dfc9;padding:20px;display:flex;justify-content:space-between;align-items:flex-start}
+.rt-main{flex:1}
+.rt-label{font-size:11px;font-weight:600;color:#2d6a4f;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+.rt-amount{font-size:36px;font-weight:600;color:#1a1a1a;letter-spacing:-.03em;font-family:'DM Sans',sans-serif;line-height:1}
+.rt-sub{font-size:12px;color:#888;margin-top:6px;display:flex;flex-direction:column;gap:2px}
+.rt-sub span{display:flex;justify-content:space-between;max-width:280px}
+.rt-pax{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.rt-pax-n{font-size:22px;font-weight:600;color:#1a1a1a}
+.rt-pax-l{font-size:10px;color:#b0a898;text-transform:uppercase;letter-spacing:.07em}
+.result-rooms{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;padding:14px}
+.rr{background:#f9f7f4;border-radius:9px;padding:12px 13px;border:0.5px solid #eae7e0}
+.rr.hi{background:linear-gradient(135deg,#f0f9ff,#eef7f2);border:1.5px solid #86efac}
+.rr-n{font-size:10px;font-weight:600;color:#b0a898;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em}
+.rr.hi .rr-n{color:#2d6a4f}
+.rr-p{font-size:21px;font-weight:600;letter-spacing:-.02em;color:#1a1a1a;margin-bottom:6px}
+.rr-d{font-size:11px;color:#b0a898;display:flex;flex-direction:column;gap:2px}
+.rr-dr{display:flex;justify-content:space-between}
+.result-stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:0.5px solid #eae7e0}
+.rs{padding:10px 14px;text-align:center;border-right:0.5px solid #eae7e0}
+.rs:last-child{border-right:none}
+.rsl{font-size:10px;color:#b0a898;margin-bottom:2px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.rsv{font-size:15px;font-weight:600;color:#1a1a1a}
+.rsv.g{color:#2d6a4f}
+
+/* Status dots */
+.sec-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:#e0dfd8;transition:.2s}
+.sec-dot.done{background:#40916c}
+.sec-dot.warn{background:#fbbf24}
+.sec-dot.skip{background:#d1d5db}
+
+/* Trip name top bar */
+.trip-bar{background:#fff;border:0.5px solid #dedad2;border-radius:12px;padding:10px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 3px rgba(0,0,0,.04);flex-wrap:wrap}
+.trip-bar-icon{font-size:16px}
+.trip-bar input[type=text]{flex:1;min-width:180px;border:none;background:none;font-size:14px;font-weight:500;color:#1a1a1a;font-family:'DM Sans',sans-serif;outline:none}
+.trip-bar input[type=text]::placeholder{color:#ccc;font-weight:400}
+.trip-bar-divider{width:0.5px;height:20px;background:#e0dfd8;flex-shrink:0}
+.trip-date-group{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.trip-date-label{font-size:10px;font-weight:600;color:#b0a898;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.trip-date-input{padding:4px 8px;border:0.5px solid #dedad2;border-radius:6px;background:#f9f7f4;font-size:12px;font-family:'DM Sans',sans-serif;color:#1a1a1a;outline:none;width:130px}
+.trip-date-input:focus{border-color:#40916c;background:#f0fdf8}
+.trip-date-return{font-size:12px;font-weight:500;color:#2d6a4f;font-family:'DM Mono',monospace;white-space:nowrap}
+.trip-bar-meta{font-size:11px;color:#b0a898;white-space:nowrap}
+
+/* Quick fill button */
+.quick-fill{font-size:11px;color:#2d6a4f;background:#eef7f2;border:0.5px solid #b7dfc9;border-radius:6px;padding:3px 9px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;white-space:nowrap}
+.quick-fill:hover{background:#d1fae5}
+.reset-btn{font-size:11px;color:#888;background:#f9f7f4;border:0.5px solid #dedad2;border-radius:6px;padding:3px 9px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.reset-btn:hover{background:#fff;border-color:#e74c3c;color:#e74c3c}
+.modified-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#fbbf24;margin-left:4px;vertical-align:middle;flex-shrink:0;title:"此欄已從合約預設修改"}
+
+/* Break-even highlight */
+.be-good{color:#2d6a4f;font-weight:600}
+.be-warn{color:#d97706;font-weight:600}
+
+/* Output mode toggle */
+.out-mode-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.out-mode-btn{padding:5px 12px;border:0.5px solid #dedad2;border-radius:7px;background:#f9f7f4;color:#888;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.out-mode-btn.on{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.out-action-row{display:flex;gap:6px;align-items:center}
+.reset-out-btn{padding:5px 10px;border:0.5px solid #dedad2;border-radius:7px;background:#f9f7f4;color:#b0a898;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.reset-out-btn:hover{border-color:#e74c3c;color:#e74c3c;background:#fff}
+
+/* Editable labels */
+[contenteditable]{outline:none;border-bottom:1px dashed transparent;border-radius:2px;transition:.15s;cursor:text}
+[contenteditable]:hover{border-bottom-color:#b0a898}
+[contenteditable]:focus{border-bottom-color:#40916c;background:rgba(64,145,108,.05);padding:0 2px}
+.out-wrap{max-width:720px}
+.out-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.out-hd h3{font-size:15px;font-weight:600}
+.copy-btn{padding:7px 16px;background:#2d6a4f;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+.copy-btn:hover{background:#1b4332}
+.copy-btn.ok{background:#40916c}
+.out-textarea{width:100%;background:#fff;border:0.5px solid #dedad2;border-radius:12px;padding:20px;font-size:13px;line-height:1.8;color:#333;font-family:'DM Sans',sans-serif;box-shadow:0 1px 3px rgba(0,0,0,.04);min-height:400px;resize:vertical;outline:none}
+.out-textarea:focus{border-color:#b7dfc9}
+.out-hint{font-size:11px;color:#b0a898;margin-top:8px;line-height:1.6}
+
+/* Quotation card preview */
+.card-preview-wrap{background:#f5f2ec;border-radius:12px;padding:16px;margin-top:0}
+.card-preview-hint{font-size:11px;color:#b0a898;margin-bottom:10px}
+.qcard{background:#fff;border-radius:16px;overflow:hidden;max-width:480px;margin:0 auto;box-shadow:0 4px 20px rgba(0,0,0,.12);font-family:'DM Sans',sans-serif}
+.qcard-top{background:linear-gradient(135deg,#1b4332,#2d6a4f);padding:24px 24px 20px;color:#fff}
+.qcard-shop{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;opacity:.7;margin-bottom:4px}
+.qcard-trip{font-size:20px;font-weight:600;letter-spacing:-.02em;margin-bottom:8px}
+.qcard-dates{font-size:12px;opacity:.8;display:flex;align-items:center;gap:6px}
+.qcard-type{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,.2);letter-spacing:.05em}
+.qcard-body{padding:20px 24px}
+.qcard-sect{margin-bottom:16px}
+.qcard-sect-title{font-size:10px;font-weight:700;color:#b0a898;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.qcard-room{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:0.5px solid #f2f0eb}
+.qcard-room:last-child{border-bottom:none}
+.qcard-room-name{font-size:13px;color:#333;font-weight:500}
+.qcard-room-price{font-size:18px;font-weight:600;color:#1b4332;letter-spacing:-.02em}
+.qcard-room-unit{font-size:11px;color:#b0a898;font-weight:400}
+.qcard-includes{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.qcard-tag{font-size:10px;font-weight:500;padding:3px 8px;border-radius:10px;background:#f0f9ff;color:#1e3a5f;border:0.5px solid #bde0fe}
+.qcard-meal-tag{background:#f0fdf4;color:#14532d;border-color:#bbf7d0}
+.qcard-footer{background:#f9f7f4;padding:14px 24px;display:flex;justify-content:space-between;align-items:center;border-top:0.5px solid #eae7e0}
+.qcard-footer-note{font-size:10px;color:#b0a898;line-height:1.5}
+.qcard-footer-logo{font-size:11px;font-weight:600;color:#2d6a4f}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ── LEFT ── -->
+<div class="left"><div class="li">
+  <div class="logo"><div class="lm">🤿</div><div><div class="lt">潛水成本計算器</div><div class="ls">Contract Library</div></div></div>
+  <div id="tree"></div>
+  <hr class="dvd">
+  <div class="ic" id="info-card"><div style="color:#b0a898;font-size:11px">選擇左側潛店以載入合約資訊</div></div>
+</div></div>
+
+<!-- ── RIGHT ── -->
+<div class="right">
+<div class="tab-bar">
+  <button class="tab-btn on" onclick="switchTab('calc',this)">成本計算</button>
+  <button class="tab-btn" onclick="switchTab('output',this)">輸出摘要</button>
+  <div style="flex:1"></div>
+  <span id="type-badge" style="display:none;font-size:11px;font-weight:600;padding:3px 10px;border-radius:10px"></span>
+</div>
+
+<!-- CALC TAB -->
+<div id="tab-calc" class="tab-s show">
+
+<!-- Trip name bar -->
+<div class="trip-bar">
+  <span class="trip-bar-icon">✈️</span>
+  <input type="text" id="trip-name" placeholder="輸入行程名稱（如：Moalboal 5D4N）">
+  <div class="trip-bar-divider"></div>
+  <div class="trip-date-group">
+    <span class="trip-date-label">出發</span>
+    <input type="date" class="trip-date-input" id="dep-date" onchange="updateReturnDate()">
+  </div>
+  <div class="trip-date-group">
+    <span class="trip-date-label">回程</span>
+    <span class="trip-date-return" id="ret-date">—</span>
+  </div>
+  <div class="trip-bar-divider"></div>
+  <span class="trip-bar-meta" id="trip-bar-meta">尚未載入合約</span>
+</div>
+
+<!-- Basic settings -->
+<div class="settings-bar">
+  <div class="sf"><label>幣別</label>
+    <select id="cur" onchange="onCurChange()">
+      <option value="HKD">HKD 港幣</option>
+      <option value="USD">USD 美元</option>
+      <option value="PHP">PHP 披索</option>
+      <option value="TWD">TWD 台幣</option>
+    </select>
+  </div>
+  <div class="sf"><label id="fx-lbl">匯率 HKD→TWD</label>
+    <input id="fx" type="number" value="4" step="0.01" oninput="calc()">
+    <div class="sh">手動輸入</div>
+  </div>
+  <div class="sf"><label>Markup %</label>
+    <input id="mk" type="number" value="12" step="0.5" oninput="calc()">
+  </div>
+  <div class="sf"><label>FOC 規則</label>
+    <select id="foc" onchange="calc()">
+      <option value="none">無 FOC</option>
+      <option value="5p1">5+1（每6人送1）</option>
+      <option value="9p1">9+1（每10人送1）</option>
+    </select>
+  </div>
+  <div class="sf"><label>出發人數（含FOC）</label>
+    <input id="tot-pax" type="number" value="10" min="1" oninput="calc()">
+    <div class="foc-desc" id="foc-desc">—</div>
+  </div>
+</div>
+
+<!-- ① Fixed content -->
+<div class="sec" id="sec-fixed">
+  <div class="sec-h" onclick="toggleSec('fixed')">
+    <div class="sec-title"><span class="sec-num">①</span>固定內容（合約包含）<span class="sec-dot skip" id="dot-fixed"></span></div>
+    <span class="sec-toggle" id="stog-fixed">▾</span>
+  </div>
+  <div class="sec-body" id="sbody-fixed">
+    <div id="fixed-content" style="font-size:11px;color:#555;line-height:1.7">載入合約後顯示</div>
+  </div>
+</div>
+
+<!-- ② Accommodation -->
+<div class="sec" id="sec-accom">
+  <div class="sec-h" onclick="toggleSec('accom')">
+    <div class="sec-title"><span class="sec-num">②</span>住宿<span class="sec-dot skip" id="dot-accom"></span></div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <button class="quick-fill" onclick="event.stopPropagation();quickFill()">快速分配人數</button>
+      <button class="reset-btn" onclick="event.stopPropagation();resetToDefaults()" title="還原房型價格至合約預設值（保留人數）">↺ 還原合約預設</button>
+      <span class="sec-meta" id="accom-meta">—</span>
+    </div>
+    <span class="sec-toggle" id="stog-accom">▾</span>
+  </div>
+  <div class="sec-body" id="sbody-accom">
+    <div id="dur-wrap" style="display:none">
+      <div class="dur-row" id="dur-row"></div>
+      <div style="font-size:10px;color:#b0a898;margin-bottom:8px" id="dur-note"></div>
+    </div>
+    <table>
+      <colgroup><col style="width:22%"><col style="width:14%"><col style="width:9%"><col style="width:10%"><col style="width:12%"><col style="width:9%"><col style="width:16%"><col style="width:8%"></colgroup>
+      <thead><tr><th id="r-h1">房型 / 艙型</th><th id="r-h2">費用（原幣）</th><th id="r-h3">晚數</th><th>人數</th><th>Single Supp</th><th>單人數</th><th>住宿小計(TWD)</th><th></th></tr></thead>
+      <tbody id="room-body"></tbody>
+    </table>
+    <button class="add-r" onclick="addRoom()">＋ 新增房型</button>
+    <div class="sec-sub"><span>住宿合計</span><span id="accom-tot">—</span></div>
+  </div>
+</div>
+
+<!-- ③ Meals -->
+<div class="sec" id="sec-meal">
+  <div class="sec-h" onclick="toggleSec('meal')">
+    <div class="sec-title"><span class="sec-num">③</span>餐食<span class="sec-dot skip" id="dot-meal"></span></div>
+    <span class="sec-meta" id="meal-meta">—</span>
+    <span class="sec-toggle" id="stog-meal">▾</span>
+  </div>
+  <div class="sec-body" id="sbody-meal">
+    <div id="meal-content"></div>
+    <div class="sec-sub" id="meal-sub" style="display:none"><span>餐食附加費合計</span><span id="meal-tot">—</span></div>
+  </div>
+</div>
+
+<!-- ④ Transfers -->
+<div class="sec" id="sec-tran">
+  <div class="sec-h" onclick="toggleSec('tran')">
+    <div class="sec-title"><span class="sec-num">④</span>來回接送<span class="sec-dot skip" id="dot-tran"></span></div>
+    <span class="sec-meta" id="tran-meta">—</span>
+    <span class="sec-toggle" id="stog-tran">▾</span>
+  </div>
+  <div class="sec-body" id="sbody-tran">
+    <table>
+      <colgroup><col style="width:28%"><col style="width:16%"><col style="width:12%"><col style="width:12%"><col style="width:16%"><col style="width:10%"><col style="width:6%"></colgroup>
+      <thead><tr><th>接送項目</th><th>費用</th><th>幣別</th><th>數量</th><th>TWD 合計</th><th>備註</th><th></th></tr></thead>
+      <tbody id="tran-body"></tbody>
+    </table>
+    <div id="tran-presets" style="padding:6px 14px;border-top:0.5px solid #f2f0eb;display:flex;gap:6px;flex-wrap:wrap"></div>
+    <button class="add-r" onclick="addTran()">＋ 新增接送費用</button>
+    <div class="sec-sub"><span>接送合計 / 每人均攤</span><span id="tran-tot">—</span></div>
+  </div>
+</div>
+
+<!-- ⑤ Dive costs -->
+<div class="sec" id="sec-dive">
+  <div class="sec-h" onclick="toggleSec('dive')">
+    <div class="sec-title"><span class="sec-num">⑤</span>潛水費<span class="sec-dot skip" id="dot-dive"></span></div>
+    <span class="sec-meta" id="dive-meta">—</span>
+    <span class="sec-toggle" id="stog-dive">▾</span>
+  </div>
+  <div class="sec-body" id="sbody-dive">
+    <div id="dive-content"></div>
+    <div class="sec-sub" id="dive-sub" style="display:none"><span>潛水費合計 / 每人</span><span id="dive-tot">—</span></div>
+  </div>
+</div>
+
+<!-- ⑥ Equipment rental -->
+<div class="sec" id="sec-equip">
+  <div class="sec-h" onclick="toggleSec('equip')">
+    <div class="sec-title"><span class="sec-num">⑥</span>器材租借<span class="sec-dot skip" id="dot-equip"></span></div>
+    <span class="sec-meta" id="equip-meta">選填</span>
+    <span class="sec-toggle" id="stog-equip">▾</span>
+  </div>
+  <div class="sec-body" id="sbody-equip">
+    <div id="equip-body"></div>
+    <div class="sec-sub"><span>器材合計</span><span id="equip-tot">—</span></div>
+  </div>
+</div>
+
+<!-- ⑦ Add-ons -->
+<div class="sec" id="sec-addon">
+  <div class="sec-h" onclick="toggleSec('addon')">
+    <div class="sec-title"><span class="sec-num">⑦</span>加購項目<span class="sec-dot skip" id="dot-addon"></span></div>
+    <span class="sec-meta" id="addon-meta">選填</span>
+    <span class="sec-toggle" id="stog-addon">▾</span>
+  </div>
+  <div class="sec-body" id="sbody-addon">
+    <div id="addon-body"></div>
+  </div>
+</div>
+
+<!-- ⑧ Taiwan side -->
+<div class="sec" id="sec-tw">
+  <div class="sec-h" onclick="toggleSec('tw')">
+    <div class="sec-title"><span class="sec-num">⑧</span>台灣端費用<span class="sec-dot skip" id="dot-tw"></span></div>
+    <span class="sec-meta" id="tw-meta">—</span>
+    <span class="sec-toggle" id="stog-tw">▾</span>
+  </div>
+  <div class="sec-body" id="sbody-tw">
+    <div class="tw-row">
+      <input type="checkbox" class="tw-ck" id="tw-ins-on" checked onchange="calc()">
+      <div style="flex:1">
+        <div class="tw-name" contenteditable="true" id="tw-ins-lbl">保險（旅平險＋潛水險）</div>
+        <div class="tw-sub">TWD，每人固定（含 FOC）</div>
+      </div>
+      <input type="number" class="tw-inp" id="tw-ins" value="1000" oninput="calc()">
+      <span class="tw-cur">TWD/人</span>
+      <span class="tw-res" id="tw-ins-r">—</span>
+    </div>
+    <div class="tw-row">
+      <input type="checkbox" class="tw-ck" id="tw-fl-on" onchange="calc()">
+      <div style="flex:1">
+        <div class="tw-name" contenteditable="true" id="tw-fl-lbl">領隊機票</div>
+        <div class="tw-sub">TWD 總額</div>
+      </div>
+      <input type="number" class="tw-inp" id="tw-fl" value="0" oninput="calc()">
+      <span class="tw-cur">TWD 總</span>
+      <span class="tw-res" id="tw-fl-r">—</span>
+    </div>
+    <div class="tw-row">
+      <input type="checkbox" class="tw-ck" id="tw-st-on" onchange="calc()">
+      <div style="flex:1">
+        <div class="tw-name" contenteditable="true" id="tw-st-lbl">工作人員費</div>
+        <div class="tw-sub">TWD 總額</div>
+      </div>
+      <input type="number" class="tw-inp" id="tw-st" value="0" oninput="calc()">
+      <span class="tw-cur">TWD 總</span>
+      <span class="tw-res" id="tw-st-r">—</span>
+    </div>
+    <div class="tw-row">
+      <input type="checkbox" class="tw-ck" id="tw-sim-on" onchange="calc()">
+      <div style="flex:1">
+        <div class="tw-name" contenteditable="true" id="tw-sim-lbl">網卡 SIM Card</div>
+        <div class="tw-sub">TWD，每人一張（含 FOC）</div>
+      </div>
+      <input type="number" class="tw-inp" id="tw-sim" value="300" oninput="calc()">
+      <span class="tw-cur">TWD/人</span>
+      <span class="tw-res" id="tw-sim-r">—</span>
+    </div>
+    <div id="tw-other-body"></div>
+    <button class="add-r" onclick="addTwOther()">＋ 新增其他費用</button>
+    <div class="sec-sub"><span>台灣端合計</span><span id="tw-tot">—</span></div>
+  </div>
+</div>
+
+<!-- Results -->
+<div class="result-wrap">
+  <div class="result-top">
+    <div class="rt-main">
+      <div class="rt-label">整團需支付</div>
+      <div class="rt-amount" id="rt-amount">—</div>
+      <div class="rt-sub" id="rt-sub"></div>
+    </div>
+    <div class="rt-pax">
+      <div class="rt-pax-l">行程名稱</div>
+      <div id="rt-trip-name" style="font-size:12px;font-weight:500;color:#1b4332;text-align:right;max-width:160px;word-break:break-all">—</div>
+    </div>
+  </div>
+  <div class="result-rooms" id="result-rooms"></div>
+  <div class="result-stats" id="result-stats"></div>
+</div>
+</div><!-- end calc tab -->
+
+<!-- OUTPUT TAB -->
+<div id="tab-output" class="tab-s">
+<div class="out-wrap">
+  <div class="out-hd">
+    <h3>輸出摘要</h3>
+    <div class="out-action-row">
+      <button class="reset-out-btn" onclick="resetOutput()" title="還原自動生成內容">↺ 還原預設</button>
+      <button class="copy-btn" id="copy-btn" onclick="copyOut()">複製全部</button>
+    </div>
+  </div>
+  <div class="out-mode-row">
+    <button class="out-mode-btn on" id="omd-client" onclick="setOutMode('client',this)">📄 客人報價</button>
+    <button class="out-mode-btn" id="omd-ai" onclick="setOutMode('ai',this)">🤖 AI 指令版</button>
+    <button class="out-mode-btn" id="omd-booking" onclick="setOutMode('booking',this)">📧 英文預約信</button>
+  </div>
+  <!-- Text modes -->
+  <div id="out-text-wrap">
+    <textarea class="out-textarea" id="out-text" placeholder="請先在成本計算頁填入資料..."></textarea>
+    <div class="out-hint" id="out-hint">✦ 不含成本和 markup，可直接傳給客人或用 email 發送</div>
+  </div>
+</div>
+</div>
+
+</div><!-- end right -->
+</div><!-- end app -->
+
+<script>
+// ── SHOPS DATA ──
+var TREE=[
+  {country:'🇵🇭 菲律賓',id:'ph',open:true,regions:[
+    {name:'宿霧 Cebu',shops:['paradive_moalboal','paradive_mactan','clubhari','devocean','kasai_village']}
+  ]},
+  {country:'🇲🇻 馬爾地夫',id:'mv',open:false,regions:[
+    {name:'SCUBASPA Fleet',shops:['scubaspa_maldives']}
+  ]},
+  {country:'🇮🇩 印尼',id:'id',open:false,regions:[
+    {name:'SCUBASPA Fleet',shops:['scubaspa_indonesia']}
+  ]}
+];
+
+var SHOPS={
+  paradive_moalboal:{
+    name:'Paradive Moalboal',sub:'宿霧 墨寶 · 潛水樂園',type:'resort',
+    tag:'HKD',tagCls:'tag-hkd',contractValidity:'2026（Updated Nov 2025）',
+    currency:'HKD',fx:4,mk:12,foc:'5p1',
+    accomMode:'package',
+    packages:[
+      {id:'4d3n',label:'4D3N',sub:'6潛',rooms:[
+        {n:'潛水員套餐',c:3830,ss:1300},{n:'非潛水員套餐',c:2260,ss:1300},{n:'小童（10歲以下）',c:800,ss:0}]},
+      {id:'5d4n',label:'5D4N',sub:'8潛',def:true,rooms:[
+        {n:'潛水員套餐',c:4510,ss:1440},{n:'非潛水員套餐',c:2580,ss:1440},{n:'小童（10歲以下）',c:950,ss:0}]},
+      {id:'6d5n',label:'6D5N',sub:'10潛',rooms:[
+        {n:'潛水員套餐',c:5180,ss:1590},{n:'非潛水員套餐',c:2880,ss:1590},{n:'小童（10歲以下）',c:1110,ss:0}]}
+    ],
+    mealPlans:[
+      {id:'hb',label:'半膳 Half Board',sub:'早餐＋午餐，晚餐自費',supplement:0,def:true,note:'套餐預設包含'},
+      {id:'fb',label:'全膳 Full Board',sub:'早餐＋午餐＋晚餐',supplement:0,note:'晚餐需向度假村另行確認費用，建議預估 HKD 100-150/人/晚，填入下方金額'}
+    ],
+    defaultTransfers:[{name:'領隊接送 Cebu→Moalboal 來回',cost:580,currency:'HKD',qty:1,note:'HKD/趟'}],
+    divesIncluded:true,
+    rentals:[
+      {id:'bcd',name:'BCD + Reg',rate:120,currency:'HKD',unit:'天'},
+      {id:'full',name:'全套器材',rate:240,currency:'HKD',unit:'天'},
+      {id:'comp',name:'潛水電腦錶',rate:100,currency:'HKD',unit:'天'},
+      {id:'skin',name:'面鏡/呼吸管/蛙鞋',rate:120,currency:'HKD',unit:'天'}
+    ],
+    addons:[
+      {id:'aft',name:'午後加潛',sub:'最少4人',rate:240,currency:'HKD',unit:'次'},
+      {id:'night',name:'夜潛',sub:'最少4人，電筒+HK$50',rate:260,currency:'HKD',unit:'次'}
+    ],
+    includes:['宿霧機場↔度假村接送','雙/三人房＋冷氣','早餐＋午餐','潛水船、導遊、氣瓶'],
+    excludes:['機票＋機場稅','晚餐和飲料','額外加潛/夜潛','個人潛水器材'],
+    payment:'確認後7天內付30%訂金，出發前30天付清',cancellation:'合約未列明，建議書面確認'
+  },
+  paradive_mactan:{
+    name:'Paradive Mactan',sub:'宿霧 麥克坦島 · 潛水樂園',type:'resort',
+    tag:'HKD',tagCls:'tag-hkd',contractValidity:'2026（Updated Nov 2025）',
+    currency:'HKD',fx:4,mk:12,foc:'5p1',
+    accomMode:'package',
+    packages:[
+      {id:'4d3n',label:'4D3N',sub:'6潛',rooms:[
+        {n:'潛水員套餐',c:3030,ss:1300},{n:'非潛水員套餐',c:1720,ss:1300},{n:'小童（10歲以下）',c:830,ss:0}]},
+      {id:'5d4n',label:'5D4N',sub:'8潛',def:true,rooms:[
+        {n:'潛水員套餐',c:3640,ss:1440},{n:'非潛水員套餐',c:2010,ss:1440},{n:'小童（10歲以下）',c:990,ss:0}]},
+      {id:'6d5n',label:'6D5N',sub:'10潛',rooms:[
+        {n:'潛水員套餐',c:4230,ss:1590},{n:'非潛水員套餐',c:2290,ss:1590},{n:'小童（10歲以下）',c:1150,ss:0}]}
+    ],
+    mealPlans:[
+      {id:'hb',label:'半膳 Half Board',sub:'早餐＋午餐，晚餐自費',supplement:0,def:true,note:'套餐預設包含'},
+      {id:'fb',label:'全膳 Full Board',sub:'早餐＋午餐＋晚餐',supplement:0,note:'晚餐需向度假村確認，建議預估 HKD 100-150/人/晚'}
+    ],
+    defaultTransfers:[],
+    divesIncluded:true,
+    rentals:[
+      {id:'bcd',name:'BCD + Reg',rate:120,currency:'HKD',unit:'天'},
+      {id:'full',name:'全套器材',rate:240,currency:'HKD',unit:'天'},
+      {id:'comp',name:'潛水電腦錶',rate:100,currency:'HKD',unit:'天'}
+    ],
+    addons:[
+      {id:'aft',name:'午後加潛',sub:'最少4人',rate:240,currency:'HKD',unit:'次'},
+      {id:'night',name:'夜潛',sub:'最少4人，電筒+HK$50',rate:260,currency:'HKD',unit:'次'}
+    ],
+    includes:['宿霧機場↔度假村接送','雙/三人房＋冷氣','早餐＋午餐','潛水船、導遊、氣瓶'],
+    excludes:['機票＋機場稅','晚餐和飲料','額外加潛/夜潛','個人潛水器材'],
+    payment:'確認後7天內付30%訂金，出發前30天付清',cancellation:'合約未列明，建議書面確認'
+  },
+  clubhari:{
+    name:'Club Hari Dive Resort',sub:'宿霧 墨寶',type:'resort',
+    tag:'USD',tagCls:'tag-usd',contractValidity:'Jan–Dec 2026',
+    currency:'USD',fx:33,mk:12,foc:'none',
+    accomMode:'package',
+    packages:[
+      {id:'4n5d',label:'4N5D',sub:'12潛，net rate',def:true,rooms:[
+        {n:'潛水員（6人以上）',c:445,ss:120,note:'4N5D 總價 net，SS=$30×4晚=$120'},
+        {n:'非潛水員（6人以上）',c:250,ss:120,note:'4N5D 總價 net，SS=$120'}
+      ]}
+    ],
+    mealPlans:[
+      {id:'hb',label:'半膳 Half Board',sub:'早餐＋午餐',supplement:0,def:true},
+      {id:'fb',label:'全膳 Full Board',sub:'早餐＋午餐＋晚餐（4晚）',supplement:80,note:'USD 20/人/天 × 4晚 = USD 80/人 總計'}
+    ],
+    defaultTransfers:[{name:'Cebu Airport ↔ Club Hari 來回（Van）',cost:210,currency:'USD',qty:1,note:'Non-commissionable，參考價，依當時報價'}],
+    divesIncluded:true,
+    rentals:[
+      {id:'full',name:'全套器材（net）',rate:20,currency:'USD',unit:'天'},
+      {id:'bcd',name:'BCD + Reg（net）',rate:15,currency:'USD',unit:'天'},
+      {id:'comp',name:'電腦錶（net）',rate:8,currency:'USD',unit:'天'}
+    ],
+    addons:[
+      {id:'day',name:'加潛（net）',sub:'',rate:30,currency:'USD',unit:'次'},
+      {id:'night',name:'夜潛（net）',sub:'',rate:40,currency:'USD',unit:'次'},
+      {id:'nitrox',name:'Nitrox 32%（net）',sub:'',rate:8,currency:'USD',unit:'支'}
+    ],
+    includes:['機場接送','雙/三人房＋冷氣','早餐＋午餐','潛水船、導遊、氣瓶、鉛帶','海洋公園費'],
+    excludes:['機票＋機場稅','晚餐和飲料（可升級全膳）','額外加潛/夜潛','個人潛水器材'],
+    payment:'50% T/T確認，餘款現場現金或T/T',cancellation:'2週前免費；2週內50%；高峰季不退',
+    extraNote:'分級：2-3人$485，4-5人$455，6人+$445。已套入6人+ net rate。'
+  },
+  devocean:{
+    name:'Devocean Divers',sub:'宿霧 Malapascua · 佣金模式',type:'resort',
+    tag:'佣金',tagCls:'tag-comm',contractValidity:'至 2026/09/30',
+    currency:'PHP',fx:0.88,mk:0,foc:'9p1',
+    accomMode:'pernight',defaultNights:4,
+    rooms:[
+      {n:'Standard 花園景（雙人房）',c:3018,ss:0,note:'PHP/晚，淨（公告3550×0.85）'},
+      {n:'Superior 花園景（雙人房）',c:3995,ss:0,note:'PHP/晚，淨（公告4700×0.85）'},
+      {n:'Deluxe 海景（雙人房）',c:5015,ss:0,note:'PHP/晚，淨（公告5900×0.85）'}
+    ],
+    mealPlans:[
+      {id:'ro',label:'純房 Room Only',sub:'三餐完全自費',supplement:0,def:true},
+      {id:'hb',label:'加早餐 Breakfast',sub:'Hippocampus 餐廳，à la carte',supplement:0,note:'早餐費用需向 Hippocampus 確認，約 PHP 350-500/人/天'},
+    ],
+    defaultTransfers:[],
+    divesIncluded:false,diveMode:'perday',
+    diveRates:[
+      {id:'1-10',label:'1-10潛',rate:1472,currency:'PHP',note:'公告1840×0.8（佣金後淨）'},
+      {id:'11-20',label:'11-20潛',rate:1420,currency:'PHP',note:'公告1775×0.8（佣金後淨）'}
+    ],
+    defaultDiveRate:'1-10',defaultDivesPerDay:3,
+    rentals:[
+      {id:'bcd',name:'BCD + Reg（佣金後淨）',rate:3273,currency:'PHP',unit:'天'},
+      {id:'comp',name:'電腦錶（佣金後淨）',rate:374,currency:'PHP',unit:'天'}
+    ],
+    addons:[
+      {id:'park',name:'海洋公園費',sub:'每人每天',rate:300,currency:'PHP',unit:'天'},
+      {id:'thresher',name:'Thresher潛點保護費',sub:'每人每天，如適用',rate:150,currency:'PHP',unit:'天'},
+      {id:'night',name:'夜潛 Surcharge',sub:'最少2人',rate:200,currency:'PHP',unit:'次'},
+      {id:'morn',name:'清晨潛 Surcharge',sub:'最少4人',rate:100,currency:'PHP',unit:'次'}
+    ],
+    includes:['潛水導遊','氣瓶','快艇'],
+    excludes:['機票','接送（0%佣金）','住宿（另計15%佣金）','海洋公園費（現場付）'],
+    payment:'確認時付20%，出發前15天付清',
+    cancellation:'60天前20%；30-15天50%；15天內100%；天候不退款',
+    extraNote:'Commission模式：潛水20%、住宿15%。各欄已填入佣金後淨價。'
+  },
+  kasai_village:{
+    name:'Kasai Village Dive & Spa Resort',sub:'宿霧 墨寶',type:'resort',
+    tag:'USD',tagCls:'tag-usd',contractValidity:'2019-2020（⚠ 請確認更新版本）',
+    currency:'USD',fx:33,mk:12,foc:'9p1',
+    accomMode:'pernight',defaultNights:5,
+    rooms:[
+      {n:'Poolside Deluxe（雙人房每人）',c:44.80,ss:21.70,note:'$89.60/晚÷2，SS=$21.70'},
+      {n:'Sea View Deluxe（雙人房每人）',c:52.50,ss:29.40,note:'$105/晚÷2，SS=$29.40'},
+      {n:'Sea View Deluxe（三人房每人）',c:49.23,ss:0,note:'$147.70/晚÷3'}
+    ],
+    mealPlans:[
+      {id:'ro',label:'純房 Room Only',sub:'早餐已含，午晚餐自費',supplement:0,def:true,note:'房費含早餐'},
+      {id:'hb',label:'半膳 Half Board',sub:'早餐（含）＋晚餐',supplement:27.60,note:'每人每天 +USD 27.60（Wholesaler 8% off）'},
+      {id:'fb',label:'全膳 Full Board',sub:'早餐（含）＋午＋晚餐',supplement:50.60,note:'每人每天 +USD 50.60（Wholesaler 8% off）'}
+    ],
+    defaultTransfers:[
+      {name:'Cebu Airport ↔ Kasai 來回（Van）',cost:210,currency:'USD',qty:1,note:'Max 3-7 pax'},
+      {name:'Cebu Airport ↔ Kasai 來回（Car）',cost:180,currency:'USD',qty:0,note:'Max 3 pax'}
+    ],
+    divesIncluded:false,diveMode:'both',
+    divePackages:[
+      {id:'6d5n',label:'6D5N 12潛',ratePerPerson:897.20,note:'Full Board + Dives Bundle（已含全膳）'},
+      {id:'7d6n',label:'7D6N 15潛',ratePerPerson:1085.00,note:'Full Board + Dives Bundle（已含全膳）'},
+      {id:'8d7n',label:'8D7N 18潛',ratePerPerson:1272.80,note:'Full Board + Dives Bundle（已含全膳）'}
+    ],
+    diveRates:[
+      {id:'2-10',label:'2-10潛',rate:33.60,currency:'USD',note:'Wholesaler 30%'},
+      {id:'11-20',label:'11-20潛',rate:30.80,currency:'USD',note:'Wholesaler 30%'},
+      {id:'unl',label:'無限潛/天（min 3天）',rate:105.00,currency:'USD',note:'Wholesaler 30%'}
+    ],
+    defaultDiveRate:'2-10',defaultDivesPerDay:3,
+    rentals:[
+      {id:'full',name:'全套器材（不含DC）',rate:17,currency:'USD',unit:'天'},
+      {id:'fulldc',name:'全套器材（含DC）',rate:25,currency:'USD',unit:'天'},
+      {id:'bcd',name:'BCD',rate:6,currency:'USD',unit:'天'},
+      {id:'reg',name:'Regulator',rate:6,currency:'USD',unit:'天'},
+      {id:'comp',name:'電腦錶',rate:14,currency:'USD',unit:'天'},
+      {id:'torch',name:'電筒（含電池）',rate:10,currency:'USD',unit:'潛'}
+    ],
+    addons:[
+      {id:'night_reef',name:'夜潛（House Reef）',sub:'',rate:28,currency:'USD',unit:'次'},
+      {id:'night_boat',name:'夜潛（船）',sub:'最少2人',rate:14,currency:'USD',unit:'次'},
+      {id:'black',name:'黑水潛（含2潛+snacks）',sub:'最少2人',rate:105,currency:'USD',unit:'人'},
+      {id:'nitrox',name:'Nitrox 32%',sub:'',rate:5.60,currency:'USD',unit:'支'}
+    ],
+    includes:['早餐（含於房費）','WiFi','泳池 Try Dive（非潛水員）','礦泉水'],
+    excludes:['機票＋機場稅','午晚餐（另計餐食）','潛水費（另計）','個人潛水器材'],
+    payment:'FIT：7天內付$400/房，出發前60天付清\nGroup：7天內付$2,000，出發前90天付清\n退款扣$50手續費',
+    cancellation:'FIT：60天前=訂金沒收；59-10天=50%；9-1天=100%\nGroup：90天前=訂金沒收；89-60=50%；59-10=80%；9-1=100%',
+    extraNote:'⚠ 合約版本為 2019-2020，費率可能已更新，建議確認最新報價。器材租借為 non-commissionable。'
+  },
+  scubaspa_maldives:{
+    name:'SCUBASPA Maldives',sub:'馬爾地夫 · 7晚船宿',type:'liveaboard',
+    tag:'USD',tagCls:'tag-usd',contractValidity:'2026–2027（v.01.26）',
+    currency:'USD',fx:33,mk:12,foc:'none',
+    accomMode:'package',
+    packages:[
+      {id:'ne_7n',label:'東北季',sub:'旺季 7晚',def:true,rooms:[
+        {n:'Manta Suite（Main Deck）',c:6545,ss:1636},{n:'Dolphin Suite（Main Deck）',c:6215,ss:1554},
+        {n:'Cowrie Suite（Lower Deck）',c:5445,ss:1361},{n:'Sea Star Suite（Lower Deck）',c:5005,ss:1251}]},
+      {id:'sw_7n',label:'西南季',sub:'淡季 7晚',rooms:[
+        {n:'Manta Suite（Main Deck）',c:5445,ss:1361},{n:'Dolphin Suite（Main Deck）',c:5115,ss:1279},
+        {n:'Cowrie Suite（Lower Deck）',c:4455,ss:1114},{n:'Sea Star Suite（Lower Deck）',c:4125,ss:1031}]},
+      {id:'ds_7n',label:'Deep South',sub:'旺季+10% supp',rooms:[
+        {n:'Manta Suite（Main Deck）',c:7200,ss:3600},{n:'Dolphin Suite（Main Deck）',c:6837,ss:3418},
+        {n:'Cowrie Suite（Lower Deck）',c:5990,ss:2995},{n:'Sea Star Suite（Lower Deck）',c:5505,ss:2753}]}
+    ],
+    mealPlans:[{id:'fb',label:'全膳 Full Board',sub:'三餐全含＋飲用水、茶咖啡',supplement:0,def:true}],
+    defaultTransfers:[],divesIncluded:true,rentals:[],
+    addons:[
+      {id:'xmas',name:'聖誕/新年附加費 +15%',sub:'特定出發日適用',rate:0,currency:'USD',unit:'人'},
+      {id:'greentax',name:'Green Tax',sub:'船上自行繳付，僅供參考',rate:0,currency:'USD',unit:'人'}
+    ],
+    includes:['機場接送（最近國內機場，指定班次）','全膳食住宿（含飲用水、茶咖啡）','最多17潛（含氣瓶及配重）','瑜伽課程、浮潛、BBQ、探險行程','Wi-Fi（5GB/套房）'],
+    excludes:['國際/國內機票','Green Tax（船上自行繳付）','聖誕/新年附加費（如適用）','Deep South附加費（如適用）'],
+    payment:'依主合約條款',cancellation:'依主合約條款',
+    extraNote:'費率為 net + 10% admin fee（已含入）。Single Supp：一般25%，Deep South 50%，聖誕/新年75%。'
+  },
+  scubaspa_indonesia:{
+    name:'SCUBASPA Indonesia',sub:'印尼 · 船宿',type:'liveaboard',
+    tag:'USD',tagCls:'tag-usd',contractValidity:'2026–2028（v.01.26）',
+    currency:'USD',fx:33,mk:12,foc:'none',
+    accomMode:'package',
+    packages:[
+      {id:'raja_7n',label:'Raja Ampat 7N',sub:'Jan–Apr 2026',rooms:[
+        {n:"Owner's Manta Suite",c:9625,ss:4813},{n:'Cowrie Suite',c:7535,ss:3768},
+        {n:'Dolphin Suite',c:7205,ss:3603},{n:'Sea Star Suite',c:6325,ss:3163}]},
+      {id:'raja_10n',label:'Raja Ampat 10N',sub:'Jan–Apr 2026',def:true,rooms:[
+        {n:"Owner's Manta Suite",c:13695,ss:6848},{n:'Cowrie Suite',c:10835,ss:5418},
+        {n:'Dolphin Suite',c:10395,ss:5198},{n:'Sea Star Suite',c:8965,ss:4483}]},
+      {id:'raja_10n_late',label:'Raja Ampat 10N',sub:'Oct–Dec 2026',rooms:[
+        {n:"Owner's Manta Suite",c:14785,ss:7393},{n:'Cowrie Suite',c:11715,ss:5858},
+        {n:'Dolphin Suite',c:11165,ss:5583},{n:'Sea Star Suite',c:9515,ss:4758}]},
+      {id:'komodo_7n',label:'Komodo 7N',sub:'',rooms:[
+        {n:'Manta Suite',c:8525,ss:4263},{n:'Cowrie Suite',c:6545,ss:3273},
+        {n:'Dolphin Suite',c:6325,ss:3163},{n:'Sea Star Suite',c:5445,ss:2723}]},
+      {id:'komodo_10n',label:'Komodo 10N',sub:'',rooms:[
+        {n:'Manta Suite',c:12045,ss:6023},{n:'Cowrie Suite',c:9515,ss:4758},
+        {n:'Dolphin Suite',c:9185,ss:4593},{n:'Sea Star Suite',c:7975,ss:3988}]}
+    ],
+    mealPlans:[{id:'fb',label:'全膳 Full Board',sub:'三餐全含＋飲用水、茶咖啡',supplement:0,def:true}],
+    defaultTransfers:[],divesIncluded:true,rentals:[],
+    addons:[
+      {id:'xmas',name:'聖誕/新年附加費 +15%',sub:'特定出發日',rate:0,currency:'USD',unit:'人'},
+      {id:'parkfee',name:'國家公園/許可證費',sub:'依航線，船上自行繳付',rate:0,currency:'USD',unit:'人'}
+    ],
+    includes:['機場接送（最近國內機場，指定班次）','全膳食住宿（含飲用水、茶咖啡）','最多26潛（含氣瓶及配重）（10晚套餐）','瑜伽課程、浮潛、BBQ、探險行程','Wi-Fi（1GB/人）'],
+    excludes:['國際/國內機票','國家公園/許可證費用（依航線，船上自行繳付）','聖誕/新年附加費（如適用）'],
+    payment:'依主合約條款',cancellation:'依主合約條款',
+    extraNote:'費率為 net + 10% admin fee（已含入）。Single Supp：一般50%，聖誕/新年75%。'
+  }
+};
+
+// ── STATE ──
+var curId='paradive_moalboal', curPkg='5d4n', curMeal='default';
+var ROOMS=[], TRANS=[], EQUIP_ST={}, ADDON_ST={}, TW_OTHER=[];
+var DIVE={mode:'included',pkgId:null,rateId:'2-10',perDay:3,days:4};
+var SEC_OPEN={fixed:true,accom:true,meal:true,tran:true,dive:true,equip:true,addon:true,tw:true};
+var lastResult={grandTotal:0,supTotal:0,twTotal:0,rooms:[],revenue:0,profit:0,paying:0,free:0,totPax:0};
+var ORIG_ROOMS=[];  // original contract prices, for reset & modified detection
+
+var fmt=function(n){return Math.round(n).toLocaleString();};
+var fmtK=function(n){n=Math.round(n);return n>=10000?(n/10000).toFixed(1)+'萬':n.toLocaleString();};
+function sh(){return SHOPS[curId];}
+function getFx(){var c=document.getElementById('cur').value;var b=parseFloat(document.getElementById('fx').value)||1;return c==='TWD'?1:b;}
+function getMk(){return parseFloat(document.getElementById('mk').value)||0;}
+function getTotPax(){return parseInt(document.getElementById('tot-pax').value)||1;}
+function getFoc(){
+  var v=document.getElementById('foc').value,p=getTotPax();
+  if(v==='5p1'){var f=Math.floor(p/6);return{free:f,paying:p-f};}
+  if(v==='9p1'){var f=Math.floor(p/10);return{free:f,paying:p-f};}
+  return{free:0,paying:p};
+}
+
+// ── TABS ──
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('on');});
+  document.querySelectorAll('.tab-s').forEach(function(s){s.classList.remove('show');});
+  btn.classList.add('on');
+  document.getElementById('tab-'+id).classList.add('show');
+  if(id==='output') updateOutput();
+}
+
+// ── SECTION COLLAPSE ──
+function toggleSec(id){
+  SEC_OPEN[id]=!SEC_OPEN[id];
+  document.getElementById('sbody-'+id).style.display=SEC_OPEN[id]?'':'none';
+  document.getElementById('stog-'+id).textContent=SEC_OPEN[id]?'▾':'▸';
+}
+
+// ── TREE ──
+function buildTree(){
+  var el=document.getElementById('tree');var html='';
+  for(var ci=0;ci<TREE.length;ci++){
+    var c=TREE[ci];
+    html+='<div><div class="chd" onclick="toggleC('+ci+')">';
+    html+='<span class="chn">'+c.country+'</span>';
+    html+='<span class="carr'+(c.open?' open':'')+'" id="carr'+ci+'">▶</span></div>';
+    html+='<div id="ccnt'+ci+'" style="display:'+(c.open?'block':'none')+'">';
+    for(var ri=0;ri<c.regions.length;ri++){
+      var r=c.regions[ri];
+      html+='<div class="rn">'+r.name+'</div>';
+      for(var si=0;si<r.shops.length;si++){
+        var sid=r.shops[si];var s=SHOPS[sid];if(!s)continue;
+        html+='<button class="sb'+(sid===curId?' active':'')+(s.placeholder?' ph':'')+'" id="sb_'+sid+'"';
+        if(!s.placeholder)html+=' onclick="loadShop(\''+sid+'\')"';
+        html+='><div class="snr"><span class="sn">'+s.name+'</span>';
+        if(s.tag)html+='<span class="stag '+s.tagCls+'">'+s.tag+'</span>';
+        if(s.type==='liveaboard')html+='<span class="stag tag-live">船宿</span>';
+        else if(s.type==='resort')html+='<span class="stag tag-resort">度假村</span>';
+        html+='</div><div class="ss2">'+s.sub+'</div></button>';
+      }
+    }
+    html+='</div></div>';
+  }
+  el.innerHTML=html;
+}
+function toggleC(ci){
+  TREE[ci].open=!TREE[ci].open;
+  document.getElementById('ccnt'+ci).style.display=TREE[ci].open?'block':'none';
+  document.getElementById('carr'+ci).className='carr'+(TREE[ci].open?' open':'');
+}
+
+// ── DATES ──
+function getTripNights(){
+  var s=sh();
+  if(s.accomMode==='package'){
+    var p=null;for(var i=0;i<s.packages.length;i++){if(s.packages[i].id===curPkg){p=s.packages[i];break;}}
+    if(p){var m=p.label.match(/(\d+)N/);if(m)return parseInt(m[1]);}
+  }else if(ROOMS.length>0){return ROOMS[0].nights||1;}
+  return 0;
+}
+
+function updateReturnDate(){
+  var dep=document.getElementById('dep-date').value;
+  var retEl=document.getElementById('ret-date');
+  if(!dep){retEl.textContent='—';checkSeasonWarning(null);return;}
+  var nights=getTripNights();
+  if(nights>0){
+    var d=new Date(dep);d.setDate(d.getDate()+nights);
+    var yy=d.getFullYear();var mm=String(d.getMonth()+1).padStart(2,'0');var dd=String(d.getDate()).padStart(2,'0');
+    retEl.textContent=yy+'/'+mm+'/'+dd;
+    checkSeasonWarning(dep);
+  }else{retEl.textContent='—';}
+}
+
+function checkSeasonWarning(depStr){
+  var metaEl=document.getElementById('trip-bar-meta');
+  if(!depStr){metaEl.style.color='#b0a898';updateTripMeta();return;}
+  var d=new Date(depStr);var mo=d.getMonth()+1;var day=d.getDate();
+  var s=sh();
+  // SCUBASPA season check
+  if(curId==='scubaspa_maldives'||curId==='scubaspa_indonesia'){
+    var isXmas=(mo===12&&day>=20)||(mo===1&&day<=10);
+    var isSW=curId==='scubaspa_maldives'&&(mo>=6&&mo<=10);
+    if(isXmas){
+      metaEl.textContent='⚠ 聖誕/新年出發，記得加 +15% supplement';
+      metaEl.style.color='#d97706';return;
+    }
+    if(isSW){
+      metaEl.textContent='✦ 西南季（淡季）出發，記得選西南季費率';
+      metaEl.style.color='#2d6a4f';return;
+    }
+  }
+  // Devocean contract end check
+  if(curId==='devocean'){
+    var contractEnd=new Date('2026-09-30');
+    if(d>contractEnd){
+      metaEl.textContent='⚠ 超出合約效期（至 2026/09/30），需重新確認費率';
+      metaEl.style.color='#e74c3c';return;
+    }
+  }
+  metaEl.style.color='#b0a898';
+  updateTripMeta();
+}
+
+function getDateRange(){
+  var dep=document.getElementById('dep-date').value;
+  var ret=document.getElementById('ret-date').textContent;
+  if(!dep)return null;
+  var fmt=function(s){return s.replace(/-/g,'/');};
+  return{dep:fmt(dep),ret:ret!=='—'?ret:null};
+}
+
+// ── RESET TO DEFAULTS ──
+function resetToDefaults(){
+  var s=sh();
+  // Save pax counts before resetting
+  var savedPax=ROOMS.map(function(r){return{nPax:r.nPax,nSingles:r.nSingles};});
+  // Reload rooms from contract
+  if(s.accomMode==='package'){
+    var p=null;for(var i=0;i<s.packages.length;i++){if(s.packages[i].id===curPkg){p=s.packages[i];break;}}
+    if(!p)p=s.packages[0];
+    ROOMS=p.rooms.map(function(r){return{n:r.n,c:r.c,nights:1,nPax:0,ss:r.ss,nSingles:0,note:r.note||''};});
+  }else{
+    ROOMS=(s.rooms||[]).map(function(r){return{n:r.n,c:r.c,nights:s.defaultNights||4,nPax:0,ss:r.ss||0,nSingles:0,note:r.note||''};});
+  }
+  // Restore pax counts
+  for(var i=0;i<Math.min(ROOMS.length,savedPax.length);i++){
+    ROOMS[i].nPax=savedPax[i].nPax;
+    ROOMS[i].nSingles=savedPax[i].nSingles;
+  }
+  // Restore orig snapshot
+  ORIG_ROOMS=ROOMS.map(function(r){return{c:r.c,ss:r.ss};});
+  renderRooms();calc();
+  // Brief visual feedback
+  var btn=document.querySelector('.reset-btn');
+  if(btn){btn.textContent='✓ 已還原';btn.style.color='#2d6a4f';setTimeout(function(){btn.innerHTML='↺ 還原合約預設';btn.style.color='';},1500);}
+}
+
+// ── QUICK FILL ──
+function quickFill(){
+  var foc=getFoc();var paying=foc.paying;
+  if(ROOMS.length===0)return;
+  // Distribute paying pax to first room type
+  ROOMS[0].nPax=paying;
+  for(var i=1;i<ROOMS.length;i++)ROOMS[i].nPax=0;
+  renderRooms();calc();
+}
+
+// ── STATUS DOTS ──
+var DOT_COLORS={done:'#40916c',warn:'#fbbf24',skip:'#d1d5db'};
+function setDot(id,state){
+  var el=document.getElementById('dot-'+id);
+  if(!el)return;
+  el.className='sec-dot '+state;
+}
+function updateDots(d){
+  // ① always info
+  setDot('fixed','skip');
+  // ② accommodation: green if any room has pax
+  var hasRoomPax=d.rooms.some(function(r){return r.nPax>0;});
+  setDot('accom',hasRoomPax?'done':'warn');
+  // ③ meals: always done
+  setDot('meal','done');
+  // ④ transfers: green if any transfer total > 0
+  setDot('tran',d.tranTotal>0?'done':'skip');
+  // ⑤ dives
+  setDot('dive',sh().divesIncluded||d.diveTotal>0?'done':'warn');
+  // ⑥ equipment: skip if none checked
+  setDot('equip',d.equipTotal>0?'done':'skip');
+  // ⑦ addons: skip if none cost-included
+  setDot('addon',d.addonTotal>0?'done':'skip');
+  // ⑧ TW: green if insurance on
+  setDot('tw',document.getElementById('tw-ins-on').checked?'done':'warn');
+}
+
+// ── OUT MODE ──
+var outMode='client';
+var _outCache={client:'',ai:'',booking:''};  // cache for reset
+
+function setOutMode(m,btn){
+  outMode=m;
+  document.querySelectorAll('.out-mode-btn').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  document.getElementById('out-hint').textContent=
+    m==='client'?'✦ 不含成本和 markup，可直接傳給客人或用 email 發送':
+    m==='ai'?'✦ 帶完整指令，直接貼給 Claude 或 ChatGPT 生成正式報價單':
+    '✦ 英文 SOP 格式，直接複製發給潛店/船宿確認訂位';
+  updateOutput();
+}
+
+function resetOutput(){
+  if(outMode==='card'){updateOutput();return;}
+  var cached=_outCache[outMode]||'';
+  document.getElementById('out-text').value=cached;
+}
+
+function updateOutput(){
+  var s=sh();var r=lastResult;
+  var tripName=document.getElementById('trip-name').value||s.name;
+  var dates=getDateRange();
+  var curMpLabel='';var curMpSub='';
+  if(s.mealPlans){for(var i=0;i<s.mealPlans.length;i++){if(s.mealPlans[i].id===curMeal){curMpLabel=s.mealPlans[i].label;curMpSub=s.mealPlans[i].sub;break;}}}
+
+  if(outMode==='ai'){renderAIPrompt(s,r,tripName,dates,curMpLabel,curMpSub);return;}
+  if(outMode==='booking'){renderBookingEmail(s,r,tripName,dates,curMpLabel,curMpSub);return;}
+  renderClientQuote(s,r,tripName,dates,curMpLabel,curMpSub);
+}
+
+function renderClientQuote(s,r,tripName,dates,curMpLabel,curMpSub){
+  var lines=[];
+  lines.push('════════════════════════════════════');
+  lines.push('行程報價  Travel Quotation');
+  lines.push('════════════════════════════════════');
+  lines.push('');
+  lines.push('行程：'+tripName);
+  if(dates)lines.push('日期：'+dates.dep+(dates.ret?' → '+dates.ret:''));
+  if(curMpLabel)lines.push('餐食：'+curMpLabel+'（'+curMpSub+'）');
+  lines.push('');
+  lines.push('── 報價（每人，含旅平險）──────────');
+  lines.push('');
+  for(var i=0;i<r.rooms.length;i++){
+    var rm=r.rooms[i];
+    if(rm.nPax>0||i===0){
+      lines.push(rm.name+(rm.nPax>0?' × '+rm.nPax+'人':''));
+      lines.push('  TWD '+fmt(rm.sellPrice)+' /人');
+      if(rm.ssTWD>0)lines.push('  單人房附加費：+TWD '+fmt(rm.ssSellPrice));
+      lines.push('');
+    }
+  }
+  if(s.includes&&s.includes.length>0){
+    lines.push('── 套餐包含 ─────────────────────────');
+    for(var i=0;i<s.includes.length;i++)lines.push('✓ '+s.includes[i]);
+    lines.push('');
+  }
+  if(s.excludes&&s.excludes.length>0){
+    lines.push('── 不包含 ──────────────────────────');
+    for(var i=0;i<s.excludes.length;i++)lines.push('✗ '+s.excludes[i]);
+    lines.push('');
+  }
+  if(s.payment){lines.push('── 付款條件 ─────────────────────────');lines.push(s.payment);lines.push('');}
+  if(s.cancellation){lines.push('── 取消政策 ─────────────────────────');lines.push(s.cancellation);lines.push('');}
+  lines.push('── 備註 ─────────────────────────────');
+  lines.push('以上報價含台灣旅平險，不含國際機票。');
+  lines.push('報價如有任何疑問，歡迎聯繫我們。');
+  var text=lines.join('\n');
+  _outCache.client=text;
+  document.getElementById('out-text').value=text;
+}
+
+function renderAIPrompt(s,r,tripName,dates,curMpLabel,curMpSub){
+  var typeLabel=s.type==='liveaboard'?'船宿（Liveaboard）':'度假村（Resort）';
+  var lines=[];
+  lines.push('# 報價單生成指令');
+  lines.push('');
+  lines.push('請根據以下資料，生成一份專業的繁體中文潛水行程報價單給客人。格式要清楚、有層次、適合用 LINE 或 email 發送。不要顯示成本和 markup。');
+  lines.push('');
+  lines.push('## 行程資訊');
+  lines.push('- 行程名稱：'+tripName);
+  if(dates)lines.push('- 旅遊日期：'+dates.dep+(dates.ret?' 至 '+dates.ret:''));
+  lines.push('- 類型：'+typeLabel);
+  if(curMpLabel)lines.push('- 餐食方案：'+curMpLabel+'（'+curMpSub+'）');
+  lines.push('- 合約效期：'+(s.contractValidity||'請確認'));
+  lines.push('');
+  lines.push('## 報價（每人售價）');
+  for(var i=0;i<r.rooms.length;i++){
+    var rm=r.rooms[i];
+    if(rm.nPax>0||i===0){
+      lines.push('- '+rm.name+'：TWD '+fmt(rm.sellPrice)+'/人'+(rm.nPax>0?' × '+rm.nPax+'人':''));
+      if(rm.ssTWD>0)lines.push('  - 單人房附加費：+TWD '+fmt(rm.ssSellPrice));
+    }
+  }
+  lines.push('');
+  lines.push('## 套餐包含');
+  (s.includes||[]).forEach(function(x){lines.push('- '+x);});
+  lines.push('');
+  lines.push('## 不包含');
+  (s.excludes||[]).forEach(function(x){lines.push('- '+x);});
+  lines.push('');
+  lines.push('## 付款條件');
+  lines.push(s.payment||'');
+  lines.push('');
+  lines.push('## 取消政策');
+  lines.push(s.cancellation||'');
+  lines.push('');
+  lines.push('---');
+  lines.push('以上報價含台灣旅平險，不含國際機票。如有任何疑問請聯繫我們。');
+  var text=lines.join('\n');
+  _outCache.ai=text;
+  document.getElementById('out-text').value=text;
+}
+
+function renderBookingEmail(s,r,tripName,dates,curMpLabel,curMpSub){
+  var typeLabel=s.type==='liveaboard'?'Liveaboard':'Resort';
+  var lines=[];
+  lines.push('Subject: Group Booking Enquiry – '+tripName+(dates?' ('+dates.dep+')':''));
+  lines.push('');
+  lines.push('Dear '+s.name+' Reservations Team,');
+  lines.push('');
+  lines.push('I hope this message finds you well. I am writing on behalf of Xpert Holidays Taiwan to enquire about a group booking with the following details:');
+  lines.push('');
+  lines.push('TRIP DETAILS');
+  lines.push('────────────────────────────');
+  lines.push('Property   : '+s.name+' ('+typeLabel+')');
+  if(dates){
+    lines.push('Arrival    : '+dates.dep);
+    if(dates.ret)lines.push('Departure  : '+dates.ret);
+  }
+  lines.push('Pax        : '+r.totPax+' guests total'+(r.free>0?' ('+r.free+' FOC + '+r.paying+' paying)':''));
+  lines.push('');
+  lines.push('ROOM REQUESTS');
+  lines.push('────────────────────────────');
+  for(var i=0;i<r.rooms.length;i++){
+    var rm=r.rooms[i];
+    if(rm.nPax>0){
+      lines.push(rm.name+': '+rm.nPax+' guest(s)'+(rm.nSingles>0?', '+rm.nSingles+' single occupancy':''));
+    }
+  }
+  lines.push('');
+  lines.push('MEAL PLAN');
+  lines.push('────────────────────────────');
+  lines.push(curMpLabel+(curMpSub?' ('+curMpSub+')':''));
+  lines.push('');
+  // Addons included
+  var addonsIncl=[];
+  if(s.addons){for(var i=0;i<s.addons.length;i++){
+    var a=s.addons[i];var st=ADDON_ST[a.id]||{mode:'ref',qty:1};
+    if(st.mode==='cost')addonsIncl.push(a.name+' × '+st.qty+a.unit);
+  }}
+  if(addonsIncl.length>0){
+    lines.push('ADDITIONAL ITEMS');
+    lines.push('────────────────────────────');
+    for(var i=0;i<addonsIncl.length;i++)lines.push('- '+addonsIncl[i]);
+    lines.push('');
+  }
+  lines.push('REQUESTS & QUESTIONS');
+  lines.push('────────────────────────────');
+  lines.push('1. Could you please confirm availability for the above dates?');
+  lines.push('2. Please advise on the deposit amount and payment deadline.');
+  lines.push('3. Please share any group booking terms or conditions that apply.');
+  if(r.free>0)lines.push('4. Please confirm the FOC policy for our group size.');
+  lines.push('');
+  lines.push('We look forward to your response and hope to confirm this booking soon.');
+  lines.push('');
+  lines.push('Best regards,');
+  lines.push('[Your Name]');
+  lines.push('Xpert Holidays Taiwan – Diving Division');
+  lines.push('[Email] | [Phone]');
+  var text=lines.join('\n');
+  _outCache.booking=text;
+  document.getElementById('out-text').value=text;
+}
+
+function renderCard(){
+  var s=sh();var r=lastResult;
+  var tripName=document.getElementById('trip-name').value||s.name;
+  var dates=getDateRange();
+  var typeLabel=s.type==='liveaboard'?'🚢 Liveaboard':'🏖 Resort';
+  var curMpLabel='';
+  if(s.mealPlans){for(var i=0;i<s.mealPlans.length;i++){if(s.mealPlans[i].id===curMeal){curMpLabel=s.mealPlans[i].label;break;}}}
+
+  var roomsHTML='';
+  for(var i=0;i<r.rooms.length;i++){
+    var rm=r.rooms[i];
+    if(rm.nPax>0||i===0){
+      roomsHTML+='<div class="qcard-room">'
+        +'<div><div class="qcard-room-name">'+rm.name+'</div>'+(rm.nPax>0?'<div style="font-size:10px;color:#b0a898;margin-top:1px">× '+rm.nPax+' 人</div>':'')+'</div>'
+        +'<div style="text-align:right"><span class="qcard-room-price">'+fmt(rm.sellPrice)+'</span><span class="qcard-room-unit"> TWD/人</span>'
+        +(rm.ssTWD>0?'<div style="font-size:10px;color:#b0a898;margin-top:1px">單人房 +'+fmt(rm.ssSellPrice)+'</div>':'')
+        +'</div></div>';
+    }
+  }
+
+  var tagsHTML='';
+  var topIncludes=(s.includes||[]).slice(0,4);
+  for(var i=0;i<topIncludes.length;i++){
+    tagsHTML+='<span class="qcard-tag">'+topIncludes[i]+'</span>';
+  }
+  if(curMpLabel)tagsHTML='<span class="qcard-tag qcard-meal-tag">'+curMpLabel+'</span>'+tagsHTML;
+
+  document.getElementById('qcard').innerHTML=
+    '<div class="qcard-top">'
+    +'<div class="qcard-shop">'+s.name+'</div>'
+    +'<div class="qcard-trip">'+tripName+'</div>'
+    +(dates?'<div class="qcard-dates">📅 '+dates.dep+(dates.ret?' → '+dates.ret:'')+'</div>':'')
+    +'<div style="margin-top:8px"><span class="qcard-type">'+typeLabel+'</span></div>'
+    +'</div>'
+    +'<div class="qcard-body">'
+    +'<div class="qcard-sect"><div class="qcard-sect-title">報價（每人，含旅平險）</div>'+roomsHTML+'</div>'
+    +'<div class="qcard-sect"><div class="qcard-sect-title">套餐包含</div><div class="qcard-includes">'+tagsHTML+'</div></div>'
+    +'</div>'
+    +'<div class="qcard-footer">'
+    +'<div class="qcard-footer-note">報價含台灣旅平險，不含國際機票<br>如有疑問歡迎聯繫我們</div>'
+    +'<div class="qcard-footer-logo">Xpert Holidays<br>潛水部門</div>'
+    +'</div>';
+}
+
+function copyOut(){
+  var text=document.getElementById('out-text').value;
+  navigator.clipboard.writeText(text).then(function(){
+    var btn=document.getElementById('copy-btn');btn.textContent='已複製 ✓';btn.classList.add('ok');
+    setTimeout(function(){btn.textContent='複製全部';btn.classList.remove('ok');},2000);
+  });
+}
+
+// ── TRIP BAR META ──
+function updateTripMeta(){
+  var s=sh();
+  var el=document.getElementById('trip-bar-meta');
+  if(el) el.textContent=s.name+' · '+(s.contractValidity||'');
+}
+
+// ── LOAD SHOP ──
+function loadShop(id){
+  curId=id;var s=SHOPS[id];
+  document.querySelectorAll('.sb').forEach(function(b){b.classList.remove('active');});
+  var btn=document.getElementById('sb_'+id);if(btn)btn.classList.add('active');
+  document.getElementById('cur').value=s.currency;
+  document.getElementById('fx').value=s.fx;
+  document.getElementById('mk').value=s.mk;
+  document.getElementById('foc').value=s.foc;
+  onCurChange(false);
+
+  // Type badge
+  var tb=document.getElementById('type-badge');
+  if(s.type==='liveaboard'){tb.style.display='';tb.textContent='🚢 船宿';tb.style.background='#ede9fe';tb.style.color='#5b21b6';}
+  else{tb.style.display='';tb.textContent='🏖 度假村';tb.style.background='#fce7f3';tb.style.color='#9d174d';}
+
+  // Package / pernight mode
+  if(s.accomMode==='package'){
+    var defP=null;
+    for(var i=0;i<s.packages.length;i++){if(s.packages[i].def){defP=s.packages[i];break;}}
+    if(!defP)defP=s.packages[0];
+    curPkg=defP.id;
+    ROOMS=defP.rooms.map(function(r){return{n:r.n,c:r.c,nights:1,nPax:0,ss:r.ss,nSingles:0,note:r.note||''};});
+    document.getElementById('r-h2').textContent='套餐總價/人（'+s.currency+'）';
+    document.getElementById('r-h3').textContent='—（套餐含）';
+  }else{
+    ROOMS=(s.rooms||[]).map(function(r){return{n:r.n,c:r.c,nights:s.defaultNights||4,nPax:0,ss:r.ss||0,nSingles:0,note:r.note||''};});
+    document.getElementById('r-h2').textContent='費用/人/晚（'+s.currency+'）';
+    document.getElementById('r-h3').textContent='晚數';
+  }
+
+  // Meal
+  var defM=null;
+  if(s.mealPlans&&s.mealPlans.length>0){for(var i=0;i<s.mealPlans.length;i++){if(s.mealPlans[i].def){defM=s.mealPlans[i];break;}}}
+  curMeal=defM?defM.id:'default';
+
+  // Transfers
+  TRANS=(s.defaultTransfers||[]).map(function(t){return{name:t.name,cost:t.cost,currency:t.currency,qty:t.qty,note:t.note||''};});
+
+  // Dives
+  if(s.divesIncluded){DIVE.mode='included';}
+  else{
+    DIVE.mode=s.diveMode==='package'?'package':'perday';
+    if(s.divePackages&&s.divePackages.length>0)DIVE.pkgId=s.divePackages[0].id;
+    DIVE.rateId=s.defaultDiveRate||'';
+    DIVE.perDay=s.defaultDivesPerDay||3;
+    DIVE.days=s.defaultNights||4;
+  }
+
+  // Equipment & addons
+  EQUIP_ST={};
+  (s.rentals||[]).forEach(function(r){EQUIP_ST[r.id]={on:false,days:3,nPax:10};});
+  ADDON_ST={};
+  (s.addons||[]).forEach(function(a){ADDON_ST[a.id]={mode:'ref',qty:1};});
+  TW_OTHER=[];
+  // Store original contract prices for reset/modified detection
+  ORIG_ROOMS=ROOMS.map(function(r){return{c:r.c,ss:r.ss};});
+
+  renderAll();calc();updateTripMeta();
+}
+function onCurChange(doCalc){
+  var c=document.getElementById('cur').value;
+  document.getElementById('fx-lbl').textContent=c==='TWD'?'匯率（台幣不需填）':'匯率 '+c+'→TWD';
+  if(doCalc!==false)calc();
+}
+
+// ── RENDER ALL ──
+function renderAll(){renderFixed();renderDuration();renderRooms();renderMeal();renderTrans();renderDive();renderEquip();renderAddon();renderInfo();}
+
+function renderFixed(){
+  var s=sh();
+  document.getElementById('fixed-content').innerHTML=
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
+    +'<div><div style="font-size:10px;font-weight:600;color:#b0a898;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">✓ 包含</div>'
+    +'<ul class="ic-li">'+(s.includes||[]).map(function(x){return'<li>'+x+'</li>';}).join('')+'</ul></div>'
+    +'<div><div style="font-size:10px;font-weight:600;color:#b0a898;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">✗ 不包含</div>'
+    +'<ul class="ic-li ex">'+(s.excludes||[]).map(function(x){return'<li>'+x+'</li>';}).join('')+'</ul></div>'
+    +'</div>';
+}
+
+function renderDuration(){
+  var s=sh();var wrap=document.getElementById('dur-wrap');
+  if(s.accomMode!=='package'){wrap.style.display='none';return;}
+  wrap.style.display='';
+  var html='';
+  for(var i=0;i<s.packages.length;i++){
+    var p=s.packages[i];
+    html+='<button class="dur-btn'+(p.id===curPkg?' on':'')+'" onclick="setPkg(\''+p.id+'\')">';
+    html+=p.label+'<br><span style="font-size:10px;font-weight:400">'+p.sub+'</span></button>';
+  }
+  document.getElementById('dur-row').innerHTML=html;
+  var cp=null;for(var i=0;i<s.packages.length;i++){if(s.packages[i].id===curPkg){cp=s.packages[i];break;}}
+  document.getElementById('dur-note').textContent=(cp&&cp.note)||'';
+}
+function setPkg(id){
+  var s=sh();curPkg=id;
+  var p=null;for(var i=0;i<s.packages.length;i++){if(s.packages[i].id===id){p=s.packages[i];break;}}
+  if(!p)p=s.packages[0];
+  ROOMS=p.rooms.map(function(r){return{n:r.n,c:r.c,nights:1,nPax:0,ss:r.ss,nSingles:0,note:r.note||''};});
+  ORIG_ROOMS=ROOMS.map(function(r){return{c:r.c,ss:r.ss};});
+  renderDuration();renderRooms();calc();updateReturnDate();
+}
+
+function renderRooms(){
+  var s=sh();var isPkg=s.accomMode==='package';
+  var b=document.getElementById('room-body');b.innerHTML='';
+  for(var i=0;i<ROOMS.length;i++){
+    (function(idx){
+      var r=ROOMS[idx];
+      var orig=ORIG_ROOMS[idx]||{c:r.c,ss:r.ss};
+      var rateModified=Math.abs(r.c-orig.c)>0.01;
+      var ssModified=Math.abs(r.ss-orig.ss)>0.01;
+      var cur=document.getElementById('cur').value;
+      var nc=isPkg?'<td style="color:#b0a898;font-size:10px;padding:4px 7px">套餐含</td>'
+        :'<td><input class="ti" type="number" value="'+r.nights+'" oninput="ROOMS['+idx+'].nights=parseFloat(this.value)||1;calc()" style="width:44px"></td>';
+      // Orig currency sanity label
+      var unitLabel=isPkg?'套餐總價':'×'+r.nights+'晚';
+      var origCurLabel='<span style="font-size:9px;color:#b0a898;display:block;margin-top:1px">'+cur+' '+r.c.toLocaleString()+' '+unitLabel+'</span>';
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td><input class="ti" value="'+r.n+'" oninput="ROOMS['+idx+'].n=this.value;calc()"></td>'
+        +'<td style="position:relative"><input class="ti" type="number" value="'+r.c+'" oninput="ROOMS['+idx+'].c=parseFloat(this.value)||0;renderRooms();calc()" style="padding-right:'+(rateModified?'18px':'5px')+'">'+(rateModified?'<span class="modified-dot" title="已修改，點↺還原"></span>':'')+'</td>'
+        +nc
+        +'<td><input class="ti" type="number" value="'+r.nPax+'" min="0" oninput="ROOMS['+idx+'].nPax=parseInt(this.value)||0;calc()" style="width:44px"></td>'
+        +'<td style="position:relative"><input class="ti" type="number" value="'+r.ss+'" oninput="ROOMS['+idx+'].ss=parseFloat(this.value)||0;calc()">'+(ssModified?'<span class="modified-dot" title="已修改，點↺還原"></span>':'')+'</td>'
+        +'<td><input class="ti" type="number" value="'+r.nSingles+'" min="0" oninput="ROOMS['+idx+'].nSingles=parseInt(this.value)||0;calc()" style="width:36px"></td>'
+        +'<td class="td-r" id="rt'+idx+'"><span style="font-size:11px;display:block">—</span>'+origCurLabel+'</td>'
+        +'<td><button class="del" onclick="ROOMS.splice('+idx+',1);ORIG_ROOMS.splice('+idx+',1);renderRooms();calc()">×</button></td>';
+      b.appendChild(tr);
+    })(i);
+  }
+}
+function addRoom(){
+  var s=sh();var isPkg=s.accomMode==='package';
+  var l=ROOMS.length>0?ROOMS[ROOMS.length-1]:{c:0,nights:isPkg?1:(s.defaultNights||4),ss:0};
+  ROOMS.push({n:'新房型',c:l.c,nights:l.nights,nPax:0,ss:l.ss,nSingles:0,note:''});
+  renderRooms();calc();
+}
+
+function renderMeal(){
+  var s=sh();var el=document.getElementById('meal-content');
+  var msub=document.getElementById('meal-sub');
+  if(!s.mealPlans||s.mealPlans.length===0){
+    el.innerHTML='<div style="color:#b0a898;font-size:11px">此合約未明確列出餐食選項</div>';
+    msub.style.display='none';
+    return;
+  }
+  var curMp=null;
+  for(var i=0;i<s.mealPlans.length;i++){if(s.mealPlans[i].id===curMeal){curMp=s.mealPlans[i];break;}}
+  if(!curMp)curMp=s.mealPlans[0];
+
+  // Always show buttons
+  var html='<div class="meal-row">';
+  for(var i=0;i<s.mealPlans.length;i++){
+    var mp=s.mealPlans[i];
+    html+='<button class="meal-btn'+(mp.id===curMeal?' on':'')+'" onclick="setMeal(\''+mp.id+'\')">';
+    html+=mp.label+'<br><span style="font-size:10px;font-weight:400">'+mp.sub+'</span></button>';
+  }
+  html+='</div>';
+
+  // Note
+  if(curMp.note){
+    html+='<div style="font-size:10px;color:#b0a898;margin-top:4px">'+curMp.note+'</div>';
+  }
+
+  // If non-default option selected AND supplement is 0 → show editable input
+  if(curMp.id!==s.mealPlans[0].id&&curMp.supplement===0){
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-top:8px;padding:8px 10px;background:#fffbf0;border:0.5px solid #f0d99a;border-radius:7px">';
+    html+='<span style="font-size:11px;color:#92700a;flex:1">餐食附加費（每人/天，'+document.getElementById('cur').value+'）：</span>';
+    html+='<input type="number" id="meal-supp-input" value="'+(window._mealSuppOverride||0)+'" min="0" step="1" ';
+    html+='style="width:80px;padding:4px 7px;border:0.5px solid #f0d99a;border-radius:6px;background:#fff;font-size:12px;font-family:\'DM Mono\',monospace;text-align:right" ';
+    html+='oninput="window._mealSuppOverride=parseFloat(this.value)||0;calc()">';
+    html+='<span style="font-size:11px;color:#92700a">'+document.getElementById('cur').value+'/人/天</span>';
+    html+='</div>';
+  } else if(curMp.id===s.mealPlans[0].id){
+    window._mealSuppOverride=0;
+  }
+
+  el.innerHTML=html;
+
+  // Recalculate supplement for display
+  var effSupp=curMp.supplement>0?curMp.supplement:(window._mealSuppOverride||0);
+  msub.style.display=(effSupp>0&&curMp.id!==s.mealPlans[0].id)?'flex':'none';
+  document.getElementById('meal-meta').textContent=curMp.label;
+}
+function setMeal(id){curMeal=id;renderMeal();calc();}
+
+function renderTrans(){
+  var b=document.getElementById('tran-body');b.innerHTML='';
+  for(var i=0;i<TRANS.length;i++){
+    (function(idx){
+      var t=TRANS[idx];
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td><input class="ti" value="'+t.name+'" oninput="TRANS['+idx+'].name=this.value"></td>'
+        +'<td><input class="ti" type="number" value="'+t.cost+'" oninput="TRANS['+idx+'].cost=parseFloat(this.value)||0;calc()"></td>'
+        +'<td><input class="ti" value="'+t.currency+'" style="width:44px"></td>'
+        +'<td><input class="ti" type="number" value="'+t.qty+'" min="0" oninput="TRANS['+idx+'].qty=parseInt(this.value)||0;calc()" style="width:40px"></td>'
+        +'<td class="td-r" id="tt'+idx+'">—</td>'
+        +'<td><input class="ti" value="'+(t.note||'')+'"></td>'
+        +'<td><button class="del" onclick="TRANS.splice('+idx+',1);renderTrans();calc()">×</button></td>';
+      b.appendChild(tr);
+    })(i);
+  }
+  // Presets from contract
+  var s=sh();var pp=document.getElementById('tran-presets');pp.innerHTML='';
+  if(s.defaultTransfers&&s.defaultTransfers.length>0){
+    pp.innerHTML='<span style="font-size:10px;color:#b0a898;padding:2px 0">合約預設接送：</span>';
+    for(var i=0;i<s.defaultTransfers.length;i++){
+      (function(dt){
+        var btn=document.createElement('button');
+        btn.style.cssText='font-size:10px;padding:2px 8px;border:0.5px solid #dedad2;border-radius:5px;background:#f9f7f4;cursor:pointer;font-family:inherit;color:#555';
+        btn.textContent='+ '+dt.name.substring(0,20)+'...';
+        btn.onclick=function(){TRANS.push({name:dt.name,cost:dt.cost,currency:dt.currency,qty:dt.qty,note:dt.note||''});renderTrans();calc();};
+        pp.appendChild(btn);
+      })(s.defaultTransfers[i]);
+    }
+  }
+}
+function addTran(){TRANS.push({name:'接送項目',cost:0,currency:document.getElementById('cur').value,qty:1,note:''});renderTrans();calc();}
+
+function renderDive(){
+  var s=sh();var el=document.getElementById('dive-content');var sub=document.getElementById('dive-sub');
+  if(s.divesIncluded){
+    el.innerHTML='<div class="included-badge">✓ 包含在套餐中，不另計費</div>';
+    sub.style.display='none';
+    document.getElementById('dive-meta').textContent='包含在套餐';
+    return;
+  }
+  sub.style.display='flex';
+  var html='';
+  if(s.diveMode==='both'){
+    html+='<div class="mode-toggle" style="margin-bottom:10px">';
+    html+='<button class="mode-btn'+(DIVE.mode==='package'?' on':'')+'" onclick="setDiveMode(\'package\')">套餐 Package</button>';
+    html+='<button class="mode-btn'+(DIVE.mode==='perday'?' on':'')+'" onclick="setDiveMode(\'perday\')">按天計算</button>';
+    html+='</div>';
+  }
+  if(DIVE.mode==='package'&&s.divePackages){
+    html+='<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px">';
+    for(var i=0;i<s.divePackages.length;i++){
+      var dp=s.divePackages[i];
+      html+='<button class="dur-btn'+(DIVE.pkgId===dp.id?' on':'')+'" onclick="setDivePkg(\''+dp.id+'\')" style="flex:none;padding:6px 10px;min-width:80px">';
+      html+=dp.label+'<br><span style="font-size:10px;font-weight:400">'+dp.ratePerPerson.toFixed(2)+'/人</span></button>';
+    }
+    html+='</div>';
+    var curDp=null;if(s.divePackages)for(var i=0;i<s.divePackages.length;i++){if(s.divePackages[i].id===DIVE.pkgId){curDp=s.divePackages[i];break;}}
+    if(curDp&&curDp.note)html+='<div style="font-size:10px;color:#b0a898;margin-bottom:6px">'+curDp.note+'</div>';
+  }else if(DIVE.mode==='perday'){
+    html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">';
+    // Rate selector
+    html+='<div><div style="font-size:10px;font-weight:600;color:#b0a898;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">費率</div>';
+    html+='<select id="dive-rate-sel" style="padding:5px 8px;border:0.5px solid #dedad2;border-radius:7px;background:#f9f7f4;font-size:12px;font-family:\'DM Sans\',sans-serif;width:100%" onchange="DIVE.rateId=this.value;calc()">';
+    if(s.diveRates){for(var i=0;i<s.diveRates.length;i++){var dr=s.diveRates[i];html+='<option value="'+dr.id+'"'+(DIVE.rateId===dr.id?' selected':'')+'>'+dr.label+' ('+dr.currency+' '+dr.rate+')</option>';}}
+    html+='</select></div>';
+    html+='<div><div style="font-size:10px;font-weight:600;color:#b0a898;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">每天幾潛</div>';
+    html+='<input id="dive-perday" type="number" value="'+DIVE.perDay+'" min="1" max="5" style="padding:5px 8px;border:0.5px solid #dedad2;border-radius:7px;background:#f9f7f4;font-size:12px;width:100%" oninput="DIVE.perDay=parseInt(this.value)||1;calc()"></div>';
+    html+='<div><div style="font-size:10px;font-weight:600;color:#b0a898;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">天數</div>';
+    html+='<input id="dive-days" type="number" value="'+DIVE.days+'" min="1" style="padding:5px 8px;border:0.5px solid #dedad2;border-radius:7px;background:#f9f7f4;font-size:12px;width:100%" oninput="DIVE.days=parseInt(this.value)||1;calc()"></div>';
+    html+='</div>';
+  }
+  el.innerHTML=html;
+}
+function setDiveMode(m){DIVE.mode=m;renderDive();calc();}
+function setDivePkg(id){DIVE.pkgId=id;renderDive();calc();}
+
+function renderEquip(){
+  var s=sh();var body=document.getElementById('equip-body');
+  if(!s.rentals||s.rentals.length===0){body.innerHTML='<div style="padding:10px 14px;color:#b0a898;font-size:11px">此合約無器材租借資料</div>';return;}
+  var html='';
+  for(var i=0;i<s.rentals.length;i++){
+    var r=s.rentals[i];var st=EQUIP_ST[r.id]||{on:false,days:3,nPax:10};
+    html+='<div class="eq-row'+(st.on?'':' off')+'" id="eqrow_'+r.id+'">';
+    html+='<input type="checkbox" class="eq-ck" id="eqck_'+r.id+'"'+(st.on?' checked':'')+' onchange="onEqCk(\''+r.id+'\')">';
+    html+='<div class="eq-name" contenteditable="true">'+r.name+'</div>';
+    html+='<input type="number" class="eq-n" id="eqd_'+r.id+'" value="'+st.days+'" min="1" onchange="EQUIP_ST[\''+r.id+'\'].days=parseInt(this.value)||1;calc()">';
+    html+='<span class="eq-unit">'+r.unit+'</span>';
+    html+='<input type="number" class="eq-n" id="eqp_'+r.id+'" value="'+st.nPax+'" min="1" onchange="EQUIP_ST[\''+r.id+'\'].nPax=parseInt(this.value)||1;calc()">';
+    html+='<span class="eq-unit">人</span>';
+    html+='<span class="eq-val" id="eqv_'+r.id+'">—</span>';
+    html+='<span class="eq-rate">費率 '+r.currency+' '+r.rate+'/'+r.unit+'</span>';
+    html+='</div>';
+  }
+  body.innerHTML=html;
+}
+function onEqCk(id){
+  EQUIP_ST[id].on=document.getElementById('eqck_'+id).checked;
+  document.getElementById('eqrow_'+id).className='eq-row'+(EQUIP_ST[id].on?'':' off');
+  calc();
+}
+
+function renderAddon(){
+  var s=sh();var body=document.getElementById('addon-body');
+  if(!s.addons||s.addons.length===0){body.innerHTML='<div style="padding:10px 14px;color:#b0a898;font-size:11px">此合約無加購項目資料</div>';return;}
+  var html='';
+  for(var i=0;i<s.addons.length;i++){
+    var a=s.addons[i];var st=ADDON_ST[a.id]||{mode:'ref',qty:1};
+    html+='<div class="ao-row">';
+    html+='<div><div class="ao-name" contenteditable="true">'+a.name+'</div><div class="ao-sub">'+(a.sub||'')+'</div></div>';
+    html+='<select class="ao-mode" id="aomd_'+a.id+'" onchange="onAoMode(\''+a.id+'\')">';
+    html+='<option value="cost"'+(st.mode==='cost'?' selected':'')+'>計入報價</option>';
+    html+='<option value="ref"'+(st.mode==='ref'?' selected':'')+'>僅供參考</option>';
+    html+='</select>';
+    html+='<input type="number" class="ao-n" id="aoq_'+a.id+'" value="'+st.qty+'" min="0" onchange="ADDON_ST[\''+a.id+'\'].qty=parseFloat(this.value)||0;calc()">';
+    html+='<span class="ao-unit">'+a.unit+'</span>';
+    html+='<span class="ao-val'+(st.mode==='ref'?' ref':'')+'" id="aov_'+a.id+'">—</span>';
+    html+='<span class="ao-rate">費率 '+a.currency+' '+a.rate+'/'+a.unit+'</span>';
+    html+='</div>';
+  }
+  body.innerHTML=html;
+}
+function onAoMode(id){ADDON_ST[id].mode=document.getElementById('aomd_'+id).value;calc();}
+
+function addTwOther(){
+  TW_OTHER.push({name:'其他費用',amount:0,type:'total'});
+  renderTwOther();calc();
+}
+function renderTwOther(){
+  var b=document.getElementById('tw-other-body');b.innerHTML='';
+  for(var i=0;i<TW_OTHER.length;i++){
+    (function(idx){
+      var o=TW_OTHER[idx];
+      var row=document.createElement('div');row.className='tw-row';
+      row.innerHTML='<div style="width:14px"></div>'
+        +'<div style="flex:1"><div class="tw-name" contenteditable="true" oninput="TW_OTHER['+idx+'].name=this.textContent">'+o.name+'</div></div>'
+        +'<input type="number" class="tw-inp" value="'+o.amount+'" oninput="TW_OTHER['+idx+'].amount=parseFloat(this.value)||0;calc()">'
+        +'<select style="font-size:11px;padding:3px 5px;border:0.5px solid #dedad2;border-radius:5px;background:#f9f7f4;color:#555;cursor:pointer" onchange="TW_OTHER['+idx+'].type=this.value;calc()">'
+        +'<option value="total"'+(o.type==='total'?' selected':'')+'>TWD 總</option>'
+        +'<option value="pp"'+(o.type==='pp'?' selected':'')+'>TWD/人</option>'
+        +'</select>'
+        +'<span class="tw-res" id="two'+idx+'">—</span>'
+        +'<button class="del" onclick="TW_OTHER.splice('+idx+',1);renderTwOther();calc()">×</button>';
+      b.appendChild(row);
+    })(i);
+  }
+}
+
+function renderInfo(){
+  var s=sh();
+  var html='<div class="ic-t">'+s.name+'</div>';
+  html+='<div class="ic-m">';
+  if(s.type==='liveaboard')html+='<span class="stag tag-live" style="font-size:10px;padding:2px 6px">🚢 船宿</span>';
+  else html+='<span class="stag tag-resort" style="font-size:10px;padding:2px 6px">🏖 度假村</span>';
+  if(s.contractValidity)html+='<span class="vp">'+s.contractValidity+'</span>';
+  html+='</div>';
+  if(s.payment){html+='<div><div class="ic-l">付款</div><div class="ic-li" style="white-space:pre-line;color:#555">'+s.payment+'</div></div>';}
+  if(s.cancellation){html+='<div><div class="ic-l">取消</div><div class="ic-li" style="white-space:pre-line;color:#555">'+s.cancellation+'</div></div>';}
+  if(s.extraNote)html+='<div class="ic-n">'+s.extraNote+'</div>';
+  document.getElementById('info-card').innerHTML=html;
+}
+
+// ── CALC ──
+function calc(){
+  var s=sh();
+  var fx=getFx(),mk=getMk();
+  var foc=getFoc();var free=foc.free,paying=foc.paying,totPax=getTotPax();
+  var focV=document.getElementById('foc').value;
+  var fd='—';
+  if(focV!=='none'&&free>0)fd=totPax+'人出發 → '+free+'位FOC，'+paying+'人付費';
+  else if(focV==='5p1')fd='每5位付費潛水員＋1領隊免費';
+  else if(focV==='9p1')fd='9位付費＋第10位免費';
+  document.getElementById('foc-desc').textContent=fd;
+
+  var isPkg=s.accomMode==='package';
+
+  // ② Accommodation
+  var accomTotal=0;
+  var roomBreakdown=[];
+  var totalPaxInRooms=0;
+  for(var i=0;i<ROOMS.length;i++){
+    var r=ROOMS[i];
+    var nights=isPkg?1:r.nights;
+    var accomPP=fx*r.c*nights;
+    var ssTWD=fx*r.ss*nights;
+    var groupCost=accomPP*r.nPax+ssTWD*r.nSingles;
+    accomTotal+=groupCost;
+    totalPaxInRooms+=r.nPax;
+    var el=document.getElementById('rt'+i);
+    if(el){
+      var unitLabel2=isPkg?'套餐總價':'×'+r.nights+'晚';
+      var cur2=document.getElementById('cur').value;
+      el.innerHTML='<span style="font-size:11px;display:block">TWD '+fmt(groupCost)+'</span>'
+        +'<span style="font-size:9px;color:#b0a898;display:block;margin-top:1px">'+cur2+' '+r.c.toLocaleString()+' '+unitLabel2+'</span>';
+    }
+    roomBreakdown.push({name:r.n,nPax:r.nPax,nSingles:r.nSingles,accomPP:accomPP,ssTWD:ssTWD,groupCost:groupCost});
+  }
+  document.getElementById('accom-tot').textContent='TWD '+fmt(accomTotal);
+  document.getElementById('accom-meta').textContent=totalPaxInRooms+'人 · TWD '+fmt(accomTotal);
+
+  // ③ Meal supplement
+  var mealTotal=0,mealPP=0;
+  var curMp=null;
+  if(s.mealPlans){for(var i=0;i<s.mealPlans.length;i++){if(s.mealPlans[i].id===curMeal){curMp=s.mealPlans[i];break;}}}
+  if(curMp&&curMp.id!==s.mealPlans[0].id){
+    var effSupp=curMp.supplement>0?curMp.supplement:(window._mealSuppOverride||0);
+    if(effSupp>0){
+      var maxNights=1;if(ROOMS.length>0){maxNights=0;for(var i=0;i<ROOMS.length;i++){var n=isPkg?1:ROOMS[i].nights;if(n>maxNights)maxNights=n;}}
+      mealPP=fx*effSupp*maxNights;
+      mealTotal=mealPP*paying;
+    }
+  }
+  if(document.getElementById('meal-tot'))document.getElementById('meal-tot').textContent='TWD '+fmt(mealTotal)+' 合計 / TWD '+fmt(mealPP)+' /人';
+  var msub=document.getElementById('meal-sub');if(msub)msub.style.display=mealTotal>0?'flex':'none';
+  document.getElementById('meal-meta').textContent=curMp?curMp.label:'—';
+
+  // ④ Transfers
+  var tranTotal=0;
+  for(var i=0;i<TRANS.length;i++){
+    var t=TRANS[i];
+    var tc=(t.currency===document.getElementById('cur').value||t.currency===s.currency)?fx*t.cost*t.qty:t.cost*t.qty;
+    tranTotal+=tc;
+    var el=document.getElementById('tt'+i);
+    if(el)el.textContent='TWD '+fmt(tc);
+  }
+  var tranPP=paying>0?tranTotal/paying:0;
+  document.getElementById('tran-tot').textContent='TWD '+fmt(tranTotal)+' 合計 / TWD '+fmt(Math.round(tranPP))+' /人';
+  document.getElementById('tran-meta').textContent=TRANS.length>0?'TWD '+fmt(tranTotal):'—';
+
+  // ⑤ Dives
+  var diveTotal=0,divePP=0;
+  if(!s.divesIncluded){
+    if(DIVE.mode==='package'&&s.divePackages){
+      var dp=null;for(var i=0;i<s.divePackages.length;i++){if(s.divePackages[i].id===DIVE.pkgId){dp=s.divePackages[i];break;}}
+      if(dp){divePP=fx*dp.ratePerPerson;diveTotal=divePP*paying;}
+    }else if(DIVE.mode==='perday'&&s.diveRates){
+      var dr=null;for(var i=0;i<s.diveRates.length;i++){if(s.diveRates[i].id===DIVE.rateId){dr=s.diveRates[i];break;}}
+      if(dr){divePP=fx*dr.rate*DIVE.perDay*DIVE.days;diveTotal=divePP*paying;}
+    }
+  }
+  var diveSub=document.getElementById('dive-sub');
+  if(diveSub)diveSub.style.display=!s.divesIncluded?'flex':'none';
+  var diveTotEl=document.getElementById('dive-tot');
+  if(diveTotEl)diveTotEl.textContent='TWD '+fmt(diveTotal)+' 合計 / TWD '+fmt(Math.round(divePP))+' /人';
+  document.getElementById('dive-meta').textContent=s.divesIncluded?'包含在套餐':'TWD '+fmt(Math.round(divePP))+' /人';
+
+  // ⑥ Equipment
+  var equipTotal=0;
+  if(s.rentals){for(var i=0;i<s.rentals.length;i++){
+    var r=s.rentals[i];var st=EQUIP_ST[r.id]||{on:false,days:3,nPax:10};
+    var rFx=(r.currency===document.getElementById('cur').value||r.currency===s.currency)?fx:fx;
+    var ev=st.on?rFx*r.rate*st.days*st.nPax:0;
+    var el=document.getElementById('eqv_'+r.id);if(el)el.textContent=st.on?'TWD '+fmt(ev):'—';
+    equipTotal+=ev;
+  }}
+  document.getElementById('equip-tot').textContent='TWD '+fmt(equipTotal);
+  document.getElementById('equip-meta').textContent=equipTotal>0?'TWD '+fmt(equipTotal):'選填';
+
+  // ⑦ Addons
+  var addonTotal=0;
+  if(s.addons){for(var i=0;i<s.addons.length;i++){
+    var a=s.addons[i];var st=ADDON_ST[a.id]||{mode:'ref',qty:1};
+    var aFx=fx;var av=aFx*a.rate*st.qty;
+    var isRef=st.mode==='ref';
+    var el=document.getElementById('aov_'+a.id);
+    if(el){el.textContent=isRef?'（參考 TWD '+fmt(av)+'）':'TWD '+fmt(av)+'/人';el.className='ao-val'+(isRef?' ref':'');}
+    if(!isRef)addonTotal+=av*paying;
+  }}
+  document.getElementById('addon-meta').textContent=addonTotal>0?'TWD '+fmt(addonTotal):'選填';
+
+  // ⑧ Taiwan
+  var twInsOn=document.getElementById('tw-ins-on').checked;
+  var twIns=parseFloat(document.getElementById('tw-ins').value)||0;
+  var twFlOn=document.getElementById('tw-fl-on').checked;
+  var twFl=parseFloat(document.getElementById('tw-fl').value)||0;
+  var twStOn=document.getElementById('tw-st-on').checked;
+  var twSt=parseFloat(document.getElementById('tw-st').value)||0;
+  var twSimOn=document.getElementById('tw-sim-on').checked;
+  var twSim=parseFloat(document.getElementById('tw-sim').value)||0;
+  var twInsTot=twInsOn?twIns*totPax:0;
+  var twFlTot=twFlOn?twFl:0;
+  var twStTot=twStOn?twSt:0;
+  var twSimTot=twSimOn?twSim*totPax:0;
+  document.getElementById('tw-ins-r').textContent=twInsOn?'TWD '+fmt(twInsTot):'—';
+  document.getElementById('tw-fl-r').textContent=twFlOn?'TWD '+fmt(twFlTot):'—';
+  document.getElementById('tw-st-r').textContent=twStOn?'TWD '+fmt(twStTot):'—';
+  document.getElementById('tw-sim-r').textContent=twSimOn?'TWD '+fmt(twSimTot):'—';
+  var twOtherTotal=0;
+  for(var i=0;i<TW_OTHER.length;i++){
+    var o=TW_OTHER[i];var ov=o.type==='pp'?o.amount*totPax:o.amount;
+    twOtherTotal+=ov;
+    var el=document.getElementById('two'+i);if(el)el.textContent='TWD '+fmt(ov);
+  }
+  var twTotal=twInsTot+twFlTot+twStTot+twSimTot+twOtherTotal;
+  document.getElementById('tw-tot').textContent='TWD '+fmt(twTotal);
+  document.getElementById('tw-meta').textContent='TWD '+fmt(twTotal);
+
+  // Totals
+  var supTotal=accomTotal+mealTotal+tranTotal+diveTotal+equipTotal+addonTotal;
+  var grandTotal=supTotal+twTotal;
+
+  // Shared non-room cost per paying pax
+  var nonRoomPerPax=paying>0?(mealPP+(tranTotal/paying)+(diveTotal/paying)+(equipTotal/paying)+(addonTotal/paying)+(twTotal/paying)):0;
+
+  // Per room type sell prices
+  for(var i=0;i<roomBreakdown.length;i++){
+    var rb=roomBreakdown[i];
+    var costPP=rb.accomPP+nonRoomPerPax;
+    rb.sellPrice=Math.ceil(costPP*(1+mk/100)/100)*100;
+    rb.ssSellPrice=Math.ceil(rb.ssTWD*(1+mk/100)/100)*100;
+  }
+
+  // Revenue
+  var revenue=0;
+  for(var i=0;i<roomBreakdown.length;i++){
+    revenue+=roomBreakdown[i].sellPrice*roomBreakdown[i].nPax+roomBreakdown[i].ssSellPrice*roomBreakdown[i].nSingles;
+  }
+  var profit=revenue-grandTotal;
+
+  // Break-even
+  var bePax='—',beClass='';
+  if(roomBreakdown.length>0&&roomBreakdown[0].sellPrice>0){
+    var spFirst=roomBreakdown[0].sellPrice;
+    var fixedCosts=tranTotal+twFlTot+twStTot;
+    var perPaxCost=paying>0?(grandTotal-fixedCosts)/paying:0;
+    var margin2=spFirst-perPaxCost;
+    if(margin2>0){var beN=Math.ceil(fixedCosts/margin2);bePax=beN+'人';beClass=paying>=beN?'be-good':'be-warn';}
+  }
+
+  lastResult={grandTotal:grandTotal,supTotal:supTotal,twTotal:twTotal,rooms:roomBreakdown,revenue:revenue,profit:profit,paying:paying,free:free,totPax:totPax,bePax:bePax,beClass:beClass};
+
+  // Update results
+  // Sync trip name to result area
+  var tn=document.getElementById('trip-name');
+  var rttn=document.getElementById('rt-trip-name');
+  if(tn&&rttn)rttn.textContent=tn.value||'（未填行程名稱）';
+
+  document.getElementById('rt-amount').textContent='TWD '+fmtK(grandTotal);
+  document.getElementById('rt-sub').innerHTML=
+    '<span><span style="color:#555">供應商費用</span><span style="color:#aaa">TWD '+fmtK(supTotal)+'</span></span>'
+    +'<span><span style="color:#555">台灣端費用</span><span style="color:#aaa">TWD '+fmtK(twTotal)+'</span></span>';
+
+  var rr=document.getElementById('result-rooms');rr.innerHTML='';
+  for(var i=0;i<roomBreakdown.length;i++){
+    var rb=roomBreakdown[i];
+    var d=document.createElement('div');d.className='rr'+(i===0?' hi':'');
+    var inner='<div class="rr-n">'+rb.name+'</div>';
+    inner+='<div class="rr-p">TWD '+fmt(rb.sellPrice)+'<span style="font-size:12px;font-weight:400;color:#aaa">/人</span></div>';
+    inner+='<div class="rr-d">';
+    inner+='<div class="rr-dr"><span>成本/人</span><span style="font-family:\'DM Mono\',monospace;color:#555">TWD '+fmt(Math.round(rb.accomPP+nonRoomPerPax))+'</span></div>';
+    inner+='<div class="rr-dr"><span>Markup '+mk+'%</span><span style="font-family:\'DM Mono\',monospace;color:#2d6a4f">+'+fmt(rb.sellPrice-Math.round(rb.accomPP+nonRoomPerPax))+'</span></div>';
+    if(rb.ssTWD>0)inner+='<div class="rr-dr" style="border-top:0.5px solid #eae7e0;padding-top:3px;margin-top:2px"><span>＋單人房</span><span style="font-family:\'DM Mono\',monospace">+'+fmt(rb.ssSellPrice)+'</span></div>';
+    inner+='</div>';
+    d.innerHTML=inner;rr.appendChild(d);
+  }
+  var margin=revenue>0?((profit/revenue)*100).toFixed(1):'0';
+  document.getElementById('result-stats').innerHTML=
+    '<div class="rs"><div class="rsl">出發人數</div><div class="rsv">'+totPax+' 人</div></div>'
+    +'<div class="rs"><div class="rsl">FOC / 付費</div><div class="rsv">'+free+' / '+paying+'</div></div>'
+    +'<div class="rs"><div class="rsl">損益平衡點</div><div class="rsv '+beClass+'">'+bePax+'</div></div>'
+    +'<div class="rs"><div class="rsl">預估毛利</div><div class="rsv g">TWD '+fmtK(profit)+' <span style="font-size:11px;color:#b0a898;font-weight:400">'+margin+'%</span></div></div>';
+  // Status dots
+  updateDots({rooms:roomBreakdown,tranTotal:tranTotal,diveTotal:diveTotal,equipTotal:equipTotal,addonTotal:addonTotal,twFlTot:twFlTot,twStTot:twStTot});
+}
+
+// ── OUTPUT ──
+
+// ── INIT ──
+buildTree();
+loadShop('paradive_moalboal');
+</script>
+</body>
+</html>
